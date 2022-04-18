@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=PoryDrive
+Comment=A simple 3D driving game.
+StartupNotify=false
+Exec=porydrive
+Icon=${SNAP}/meta/gui/porydrive.png
+Terminal=false
+Type=Application
+Categories=Application;Game;ArcadeGame;
