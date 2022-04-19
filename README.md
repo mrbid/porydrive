@@ -18,6 +18,7 @@ I have always like racing games, ever since the original V-Rally I was facinated
 
 ## Mouse
  - `Mouse Button4` = Zoom Snap Close/Ariel
+ - `Mouse Click Right` = Zoom Snap Close/Ariel
  - `Middle Scroll` = Zoom in/out
 
 ## Downloads
