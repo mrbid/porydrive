@@ -191,8 +191,8 @@ void loadConfig()
                 if(strcmp(set, "steerinertia") == 0){steerinertia = val;}
                 if(strcmp(set, "minsteer") == 0){minsteer = val;}
                 if(strcmp(set, "maxsteer") == 0){maxsteer = val;}
-                if(strcmp(set, "steeristeeringtransferinertiangtransfer") == 0){steeringtransfer = val;}
-                if(strcmp(set, "") == 0){steeringtransferinertia = val;}
+                if(strcmp(set, "steeringtransfer") == 0){steeringtransfer = val;}
+                if(strcmp(set, "steeringtransferinertia") == 0){steeringtransferinertia = val;}
             }
         }
         fclose(f);
