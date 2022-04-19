@@ -271,7 +271,16 @@ void rCube(f32 x, f32 y)
         bindstate = 1;
     }
 
-    if(vDistLa(pp, (vec){x, y, 0.f}) < 0.16f && bindstate != 2) // realistically only one can light up at a time
+    const f32 dla = vDistLa(pp, (vec){x, y, 0.f});
+    if(dla < 0.15f)
+    {
+        vec nf;
+        vSub(&nf, pp, (vec){x, y, 0.f});
+        vNorm(&nf);
+        vMulS(&nf, nf, fabsf(sp)); //dla*sp*10.f
+        vAdd(&pv, pv, nf);
+    }
+    if(dla < 0.16f && bindstate != 2) // realistically only one can light up at a time
     {
         glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.cid);
         glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -601,15 +610,9 @@ void main_loop()
     if(fabsf(sp) > maxspeed)
     {
         if(pg == 0)
-        {
             sp = maxspeed;
-            vMulS(&pv, pd, maxspeed);
-        }
         else
-        {
             sp = -maxspeed;
-            vMulS(&pv, pd, -maxspeed);
-        }
     }
 
     if(sp > inertia || sp < -inertia)
