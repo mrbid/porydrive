@@ -150,9 +150,54 @@ uint cp;// collected porygon count
 double st=0; // start time
 char tts[32];// time taken string
 
+// configurable vars
+f32 maxspeed = 0.006f;
+f32 acceleration = 0.001f;
+f32 inertia = 0.0001f;
+f32 drag = 0.00038f;
+f32 steeringspeed = 1.2f;
+f32 steerinertia = 233.f;
+f32 minsteer = 0.1f;
+f32 maxsteer = 0.7f;
+f32 steeringtransfer = 0.023f;
+f32 steeringtransferinertia = 280.f;
+
 //*************************************
 // utility functions
 //*************************************
+void loadConfig()
+{
+    FILE* f = fopen("config.txt", "r");
+    if(f)
+    {
+        printf("\nDetected config.txt loading settings...\n");
+        char line[256];
+        while(fgets(line, 256, f) != NULL)
+        {
+            char set[64];
+            memset(set, 0, 64);
+            float val;
+            
+            if(sscanf(line, "%63s %f", set, &val) == 2)
+            {
+                printf("Setting Loaded: %s %g\n", set, val);
+
+                if(strcmp(set, "maxspeed") == 0){maxspeed = val;}
+                if(strcmp(set, "acceleration") == 0){acceleration = val;}
+                if(strcmp(set, "inertia") == 0){inertia = val;}
+                if(strcmp(set, "drag") == 0){drag = val;}
+                if(strcmp(set, "steeringspeed") == 0){steeringspeed = val;}
+                if(strcmp(set, "steerinertia") == 0){steerinertia = val;}
+                if(strcmp(set, "minsteer") == 0){minsteer = val;}
+                if(strcmp(set, "maxsteer") == 0){maxsteer = val;}
+                if(strcmp(set, "steeringtransfer") == 0){steeringtransfer = val;}
+                if(strcmp(set, "steeringtransferinertia") == 0){steeringtransferinertia = val;}
+            }
+        }
+        fclose(f);
+    }
+}
+
 void timestamp(char* ts)
 {
     const time_t tt = time(0);
@@ -446,6 +491,8 @@ void newGame(unsigned int seed)
     srand(seed);
     srandf(seed);
 
+    loadConfig();
+
     char strts[16];
     timestamp(&strts[0]);
     printf("\n[%s] Game Start [%u].\n", strts, seed);
@@ -480,26 +527,26 @@ void main_loop()
 //*************************************
 // keystates
 //*************************************
-    f32 tr = 0.7f * ((0.006f-sp) * 233.f);
-    if(tr < 0.1f){tr = 0.1f;}
+    f32 tr = maxsteer * ((maxspeed-sp) * steerinertia);
+    if(tr < minsteer){tr = minsteer;}
 
     if(keystate[0] == 1)
     {
-        sr -= 1.2f * dt;
+        sr -= steeringspeed * dt;
         if(sr < -tr){sr = -tr;}
     }
 
     if(keystate[1] == 1)
     {
-        sr += 1.2f * dt;
+        sr += steeringspeed * dt;
         if(sr > tr){sr = tr;}
     }
     
     if(keystate[2] == 1)
     {
         vec inc;
-        sp += 0.001f * dt;
-        vMulS(&inc, pd, 0.001f * dt);
+        sp += acceleration * dt;
+        vMulS(&inc, pd, acceleration * dt);
         vAdd(&pv, pv, inc);
         pg = 0;
     }
@@ -507,8 +554,8 @@ void main_loop()
     if(keystate[3] == 1)
     {    
         vec inc;
-        sp -= 0.001f * dt;
-        vMulS(&inc, pd, -0.001f * dt);
+        sp -= acceleration * dt;
+        vMulS(&inc, pd, -acceleration * dt);
         vAdd(&pv, pv, inc);
         pg = 1;
     }
@@ -535,22 +582,32 @@ void main_loop()
 //*************************************
 // simulate car
 //*************************************
-    if(sp > 0.f)
-        sp -= 0.00038f * dt;
-    else
-        sp += 0.00038f * dt;
+    //printf("Speed: %f\n", sp);
 
-    if(sp > 0.006f)
+    if(sp > 0.f)
+        sp -= drag * dt;
+    else
+        sp += drag * dt;
+
+    if(fabsf(sp) > maxspeed)
     {
-        sp = 0.006f;
-        vMulS(&pv, pd, 0.006f);
+        if(pg == 0)
+        {
+            sp = maxspeed;
+            vMulS(&pv, pd, maxspeed);
+        }
+        else
+        {
+            sp = -maxspeed;
+            vMulS(&pv, pd, -maxspeed);
+        }
     }
 
-    if(sp > 0.0001f || sp < -0.0001f)
+    if(sp > inertia || sp < -inertia)
     {
         vAdd(&pp, pp, pv);
         vMulS(&pv, pd, sp);
-        pr -= sr * 0.023f * (sp*280.f);
+        pr -= sr * steeringtransfer * (sp*steeringtransferinertia);
     }
 
 //*************************************
@@ -732,6 +789,7 @@ int main(int argc, char** argv)
     printf("There is only one command line argument, and that is the MSAA level 0-16.\n");
     printf("----\n");
     printf("~ Keyboard Input:\n");
+    printf("ESCAPE = Focus/Unfocus Mouse Look\n");
     printf("F = FPS to console\n");
     printf("P = Player stats to console\n");
     printf("N = New Game\n");
