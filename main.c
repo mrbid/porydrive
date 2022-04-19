@@ -535,8 +535,10 @@ void main_loop()
 //*************************************
 // simulate car
 //*************************************
-    sp -= 0.00038f * dt;
-    if(sp < 0.f){sp=0.f;}
+    if(sp > 0.f)
+        sp -= 0.00038f * dt;
+    else
+        sp += 0.00038f * dt;
 
     if(sp > 0.006f)
     {
@@ -544,7 +546,7 @@ void main_loop()
         vMulS(&pv, pd, 0.006f);
     }
 
-    if(sp > 0.0001f)
+    if(sp > 0.0001f || sp < -0.0001f)
     {
         vAdd(&pp, pp, pv);
         vMulS(&pv, pd, sp);
