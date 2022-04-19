@@ -31,7 +31,7 @@ https://github.com/mrbid/porydrive/raw/main/PoryDrive-x86_64.AppImage
 https://github.com/mrbid/porydrive/raw/main/porydrive
 
 ### [ARM64] Linux Binary (Raspbian 10)
-<TBA><br>
+TBA<br>
 
 ### Windows Binary
 https://github.com/mrbid/porydrive/raw/main/porydrive.exe<br>
