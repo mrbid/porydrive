@@ -2,6 +2,7 @@
 A 3D driving game.
 
 WIP
+![Screenshot of the PoryDrive game](https://raw.githubusercontent.com/mrbid/porydrive/main/screenshot.png)
 
 I have always like racing games, ever since the original V-Rally I was facinated by the bouncy "realistic" physics of the vehicles, in 2006 I would make my first attempt at a 3D car game in C++ using the [Ogre3D rendering engine](https://www.ogre3d.org/) in the game [TeapotHunt](https://github.com/traxpuzzle/Misc-Games/raw/main/TeapotHunt.exe); basic, and with no acceleration or deceleration because at that point I didn't really understand floating-point numbers. By 2009 my Math had improved a lot thanks to the help of my University teachers, most specifically it was [Tyrone Davison](https://research.tees.ac.uk/en/persons/tyrone-davison) who taught me or well helped me realise the importance of floating-point math. In my final year of university I used Bullet Physics and DirectX 9 with C++ to make another racing game called [Burning Rubber](https://github.com/mrbid/DX9-Racing-Game) with some friends for the Team Working module. It has been a decade since then and I am overjoyed that I have finally revisited this passion of mine having created a basic car physics simulation from scratch with self-guessed knowledge of Physics.
 
