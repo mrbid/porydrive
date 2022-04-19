@@ -9,6 +9,7 @@
 
     Keyboard:
 
+        ESCAPE = Focus/Unfocus Mouse Look
         F = FPS to console
         P = Player stats to console
         N = New Game
@@ -29,7 +30,7 @@
         Although the 3D model is sourced ready made from a third-party I cannot
         stress enough how much work I had to put in to vertex colouring the segments,
         deleting non-visible faces and generally just cleaning up parts of the mesh
-        before and after triangluating it. It was a few hours of work, more finicky
+        before and after triangulating it. It was a few hours of work, more finicky
         than anything.
 
         It made me think that it would be nice to have a program that automatically
@@ -190,8 +191,8 @@ void loadConfig()
                 if(strcmp(set, "steerinertia") == 0){steerinertia = val;}
                 if(strcmp(set, "minsteer") == 0){minsteer = val;}
                 if(strcmp(set, "maxsteer") == 0){maxsteer = val;}
-                if(strcmp(set, "steeringtransfer") == 0){steeringtransfer = val;}
-                if(strcmp(set, "steeringtransferinertia") == 0){steeringtransferinertia = val;}
+                if(strcmp(set, "steeristeeringtransferinertiangtransfer") == 0){steeringtransfer = val;}
+                if(strcmp(set, "") == 0){steeringtransferinertia = val;}
             }
         }
         fclose(f);
@@ -540,6 +541,14 @@ void main_loop()
     {
         sr += steeringspeed * dt;
         if(sr > tr){sr = tr;}
+    }
+
+    if(keystate[0] == 0 && keystate[1] == 0)
+    {
+        if(sr > 0.f)
+            sr -= steeringspeed * dt;
+        else
+            sr += steeringspeed * dt;
     }
     
     if(keystate[2] == 1)
