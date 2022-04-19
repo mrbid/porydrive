@@ -16,7 +16,6 @@
         A = Turn Left
         S = Drive Backward
         D = Turn Right
-        Shift = Boost
         Space = Breaks
 
 
@@ -70,14 +69,6 @@
     #define NOSSE
 #endif
 
-// RandomType: esRandFloat fRandFloat
-// esRandFloat  - regular stdlib rand() function
-// fRandFloat   - fast random from vec.h (SEIR RAND / MMX RAND)
-#define uRandFloat esRandFloat
-
-//
-#define FAR_DISTANCE 1000.f
-
 // uncommenting this define will enable the MMX random when using fRandFloat (it's a marginally slower)
 #define SEIR_RAND
 
@@ -128,7 +119,6 @@ vec lightpos = {0.f, 0.f, 0.f};
 
 // models
 sint bindstate = -1;
-sint bindstate2 = -1;
 uint keystate[6] = {0};
 ESModel mdlBlueCube;
 ESModel mdlPurpleCube;
@@ -138,6 +128,7 @@ ESModel mdlWindows;
 ESModel mdlWheel;
 
 // game vars
+#define FAR_DISTANCE 1000.f
 #define NEWGAME_SEED 1337
 
 // camera vars
@@ -148,11 +139,14 @@ f32 yrot = 1.7f;
 f32 zoom = -0.3f;
 
 // player vars
+uint pg;// gear
 f32 pr; // rotation
+f32 sr; // steering rotation
 vec pp; // position
 vec pv; // velocity
 vec pd; // direction
-uint pm;// mined asteroid count
+f32 sp; // speed
+uint cp;// collected porygon count
 double st=0; // start time
 char tts[32];// time taken string
 
@@ -165,37 +159,9 @@ void timestamp(char* ts)
     strftime(ts, 16, "%H:%M:%S", localtime(&tt));
 }
 
-uint64_t microtime()
-{
-    struct timeval tv;
-    struct timezone tz;
-    memset(&tz, 0, sizeof(struct timezone));
-    gettimeofday(&tv, &tz);
-    return 1000000 * tv.tv_sec + tv.tv_usec;
-}
-
-static inline float fRandFloat(const float min, const float max)
+static inline f32 fRandFloat(const float min, const float max)
 {
     return min + randf() * (max-min); 
-}
-
-static inline f32 fzero(f32 f)
-{
-    if(f < 0.f){f = 0.f;}
-    return f;
-}
-
-static inline f32 fone(f32 f)
-{
-    if(f > 1.f){f = 1.f;}
-    return f;
-}
-
-static inline f32 fsat(f32 f)
-{
-    if(f < 0.f){f = 0.f;}
-    if(f > 1.f){f = 1.f;}
-    return f;
 }
 
 void timeTaken(uint ss)
@@ -229,22 +195,85 @@ void timeTaken(uint ss)
 //*************************************
 // render functions
 //*************************************
+void rCube(f32 x, f32 y)
+{
+    mIdent(&model);
+    mTranslate(&model, x, y, 0.f);
+    mMul(&modelview, &model, &view);
+
+    glUniform1f(opacity_id, 1.0f);
+
+    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+    
+    if(bindstate != 1)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.cid);
+        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(color_id);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.vid);
+        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(position_id);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.nid);
+        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(normal_id);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPurpleCube.iid);
+        
+        bindstate = 1;
+    }
+
+    if(vDistLa(pp, (vec){x, y, 0.f}) < 0.16f && bindstate != 2) // realistically only one can light up at a time
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.cid);
+        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(color_id);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.vid);
+        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(position_id);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.nid);
+        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(normal_id);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlBlueCube.iid);
+
+        bindstate = 2;
+    }
+
+    glDrawElements(GL_TRIANGLES, purplecube_numind, GL_UNSIGNED_SHORT, 0);
+}
+
 void rCar(f32 x, f32 y, f32 z, f32 rx)
 {
     bindstate = -1;
 
-    // returns direction
-    mGetDirZ(&pd, model);
-    vInv(&pd);
-
     // opaque
     glUniform1f(opacity_id, 1.0f);
+
+    // wheel spin speed
+    static f32 wr = 0.f;
+    const f32 speed = sp * 33.f;
+    if(pg == 0)
+        wr += speed;
+    else
+        wr -= speed;
 
     // wheel; front left
     mIdent(&model);
     mTranslate(&model, x, y, z);
     mRotZ(&model, -rx);
     mTranslate(&model, 0.026343f, -0.054417f, 0.012185f);
+    mRotZ(&model, sr);
+
+    // returns direction
+    mGetDirY(&pd, model);
+    vInv(&pd);
+
+    mRotY(&model, -wr);
     mMul(&modelview, &model, &view);
 
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
@@ -272,6 +301,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mTranslate(&model, x, y, z);
     mRotZ(&model, -rx);
     mTranslate(&model, 0.026343f, 0.045294f, 0.012185f);
+    mRotY(&model, -wr);
     mMul(&modelview, &model, &view);
 
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
@@ -297,9 +327,11 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
 
     mIdent(&model);
     mRotZ(&model, PI);
-    mTranslate(&model, x, y, z);
+    mTranslate(&model, -x, -y, -z);
     mRotZ(&model, -rx);
     mTranslate(&model, 0.026343f, 0.054417f, 0.012185f);
+    mRotZ(&model, sr);
+    mRotY(&model, wr);
     mMul(&modelview, &model, &view);
 
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
@@ -325,9 +357,10 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
 
     mIdent(&model);
     mRotZ(&model, PI);
-    mTranslate(&model, x, y, z);
+    mTranslate(&model, -x, -y, -z);
     mRotZ(&model, -rx);
     mTranslate(&model, 0.026343f, -0.045294f, 0.012185f);
+    mRotY(&model, wr);
     mMul(&modelview, &model, &view);
 
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
@@ -410,8 +443,6 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
 //*************************************
 void newGame(unsigned int seed)
 {
-    const uint64_t nst = microtime();
-            
     srand(seed);
     srandf(seed);
 
@@ -427,14 +458,11 @@ void newGame(unsigned int seed)
 
     st = 0;
 
-    pm = 0;
+    cp = 0;
+    pg = 0;
     pr = 0.f;
-
-    //
-
-    st = t;
-    double dlt = (double)(microtime()-nst) / 1000000.0;
-    printf("Load Time: %.2f seconds\n\n", dlt);
+    sr = 0.f;
+    sp = 0.f;
 }
 
 //*************************************
@@ -452,48 +480,76 @@ void main_loop()
 //*************************************
 // keystates
 //*************************************
+    f32 tr = 0.7f * ((0.006f-sp) * 233.f);
+    if(tr < 0.1f){tr = 0.1f;}
+
     if(keystate[0] == 1)
     {
-        pr += 3.f * dt;
+        sr -= 1.2f * dt;
+        if(sr < -tr){sr = -tr;}
     }
 
     if(keystate[1] == 1)
     {
-        pr -= 3.f * dt;
+        sr += 1.2f * dt;
+        if(sr > tr){sr = tr;}
     }
     
     if(keystate[2] == 1)
     {
-        //
+        vec inc;
+        sp += 0.001f * dt;
+        vMulS(&inc, pd, 0.001f * dt);
+        vAdd(&pv, pv, inc);
+        pg = 0;
     }
 
     if(keystate[3] == 1)
-    {
-        //
+    {    
+        vec inc;
+        sp -= 0.001f * dt;
+        vMulS(&inc, pd, -0.001f * dt);
+        vAdd(&pv, pv, inc);
+        pg = 1;
     }
 
     if(keystate[4] == 1)
     {
-        //
+        sp *= 0.99f * (1.f-dt);
     }
 
-    if(keystate[5] == 1)
-    {
-        //
-    }
-
+//*************************************
+// update title bar stats
+//*************************************
     static double ltut = 3.0;
     if(t > ltut)
     {
         timeTaken(1);
         char title[256];
-        sprintf(title, "| %s | Porygon %u |", tts, pm);
-        sprintf(title, "| %s | Porygon %u |", tts, pm);
+        sprintf(title, "| %s | Porygon %u |", tts, cp);
+        sprintf(title, "| %s | Porygon %u |", tts, cp);
         glfwSetWindowTitle(window, title);
         ltut = t + 3.0;
     }
 
-    //
+//*************************************
+// simulate car
+//*************************************
+    sp -= 0.00038f * dt;
+    if(sp < 0.f){sp=0.f;}
+
+    if(sp > 0.006f)
+    {
+        sp = 0.006f;
+        vMulS(&pv, pd, 0.006f);
+    }
+
+    if(sp > 0.0001f)
+    {
+        vAdd(&pp, pp, pv);
+        vMulS(&pv, pd, sp);
+        pr -= sr * 0.023f * (sp*280.f);
+    }
 
 //*************************************
 // camera
@@ -529,10 +585,17 @@ void main_loop()
 // main render
 //*************************************
 
+    // render scene
+    for(f32 i = -9.f; i < 18.f; i += 0.53f)
+        for(f32 j = -9.f; j < 18.f; j += 0.53f)
+            if((i < -0.1f || i > 0.1f) || (j < -0.1f || j > 0.1f)) // lol a branch for so little tut tut
+                rCube(i, j);
+
     // render player
     shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
     glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
     rCar(pp.x, pp.y, pp.z, pr);
+
 
 //*************************************
 // swap buffers / display render
@@ -552,8 +615,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_D){ keystate[1] = 1; }
         else if(key == GLFW_KEY_W){ keystate[2] = 1; }
         else if(key == GLFW_KEY_S){ keystate[3] = 1; }
-        else if(key == GLFW_KEY_LEFT_SHIFT){ keystate[4] = 1; }
-        else if(key == GLFW_KEY_SPACE){ keystate[5] = 1; }
+        else if(key == GLFW_KEY_SPACE){ keystate[4] = 1; }
 
         // new game
         else if(key == GLFW_KEY_N)
@@ -562,7 +624,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             timeTaken(0);
             char strts[16];
             timestamp(&strts[0]);
-            printf("[%s] Porygon Collected: %u\n", strts, pm);
+            printf("[%s] Porygon Collected: %u\n", strts, cp);
             printf("[%s] Time-Taken: %s or %g Seconds\n", strts, tts, t-st);
             printf("[%s] Game End.\n", strts);
             
@@ -575,7 +637,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         {
             char strts[16];
             timestamp(&strts[0]);
-            printf("[%s] Porygon Collected: %u\n", strts, pm);
+            printf("[%s] Porygon Collected: %u\n", strts, cp);
         }
 
         // toggle mouse focus
@@ -596,8 +658,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_D){ keystate[1] = 0; }
         else if(key == GLFW_KEY_W){ keystate[2] = 0; }
         else if(key == GLFW_KEY_S){ keystate[3] = 0; }
-        else if(key == GLFW_KEY_LEFT_SHIFT){ keystate[4] = 0; }
-        else if(key == GLFW_KEY_SPACE){ keystate[5] = 0; }
+        else if(key == GLFW_KEY_SPACE){ keystate[4] = 0; }
     }
 
     // show average fps
@@ -676,7 +737,6 @@ int main(int argc, char** argv)
     printf("A = Turn Left\n");
     printf("S = Drive Backward\n");
     printf("D = Turn Right\n");
-    printf("Shift = Boost\n");
     printf("Space = Break\n");
     printf("----\n");
     printf("~ Mouse Input:\n");
@@ -742,6 +802,18 @@ int main(int argc, char** argv)
     esBind(GL_ARRAY_BUFFER, &mdlWheel.iid, wheel_indices, sizeof(wheel_indices), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlWheel.cid, wheel_colors, sizeof(wheel_colors), GL_STATIC_DRAW);
 
+    // ***** BIND PURPLE CUBE *****
+    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.vid, purplecube_vertices, sizeof(purplecube_vertices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.nid, purplecube_normals, sizeof(purplecube_normals), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.iid, purplecube_indices, sizeof(purplecube_indices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.cid, purplecube_colors, sizeof(purplecube_colors), GL_STATIC_DRAW);
+
+    // ***** BIND BLUE CUBE *****
+    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.vid, bluecube_vertices, sizeof(bluecube_vertices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.nid, bluecube_normals, sizeof(bluecube_normals), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.iid, bluecube_indices, sizeof(bluecube_indices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.cid, bluecube_colors, sizeof(bluecube_colors), GL_STATIC_DRAW);
+
 //*************************************
 // compile & link shader programs
 //*************************************
@@ -784,7 +856,7 @@ int main(int argc, char** argv)
     timeTaken(0);
     char strts[16];
     timestamp(&strts[0]);
-    printf("[%s] Porygon Collected: %u\n", strts, pm);
+    printf("[%s] Porygon Collected: %u\n", strts, cp);
     printf("[%s] Time-Taken: %s or %g Seconds\n", strts, tts, t-st);
     printf("[%s] Game End.\n\n", strts);
 
