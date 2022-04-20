@@ -251,21 +251,25 @@ void timeTaken(uint ss)
 //*************************************
 // render functions
 //*************************************
+
 void iterDNA()
 {
+    // so that you don't get confused I am exploiting the
+    // fact that when a colour channel goes into minus
+    // figures very strange things begin to happen to the
+    // gradient between triangle verticies.
     static const uint mi = dna_numvert*3;
-    static uint cd = 0;
+    static f32 cd = 1.f;
     for(uint i = 0; i < mi; i++) // lavalamp it
     {
-        if(cd == 0)
-            dna_colors[i] += fRandFloat(0.1f, 0.6f);
-        else
-            dna_colors[i] -= fRandFloat(0.1f, 0.6f);
+        dna_colors[i] += fRandFloat(0.1f, 0.6f) * cd;
 
+        // and this piece of code prevents it looking like a random mess,
+        // gives some structure. This is the lava lamper.
         if(dna_colors[i] >= 1.f)
-            cd = 1;
+            cd = -1.f;
         else if(dna_colors[i] <= 0.f)
-            cd = 0;
+            cd = 1.f;
     }
     esRebind(GL_ARRAY_BUFFER, &mdlDNA.cid, dna_colors, sizeof(dna_colors), GL_STATIC_DRAW);
 }
@@ -869,11 +873,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             newGame(time(0));
         }
 
-        // else if(key == GLFW_KEY_R)
-        // {
-        //     iterDNA();
-        //     cp++;
-        // }
+        else if(key == GLFW_KEY_R)
+        {
+            printf("%g %g %g\n", dna_colors[0], dna_colors[1], dna_colors[2]);
+            iterDNA();
+            cp++;
+        }
 
         // stats
         else if(key == GLFW_KEY_P)
