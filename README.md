@@ -1,4 +1,4 @@
-# PoryDrive [WIP]
+# PoryDrive
 A 3D driving game.
 
 ![Screenshot of the PoryDrive game](https://raw.githubusercontent.com/mrbid/porydrive/main/screenshot.png)
