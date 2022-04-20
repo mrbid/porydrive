@@ -79,6 +79,7 @@
 #include "assets/bluecube.h"
 #include "assets/purplecube.h"
 #include "assets/porygon.h"
+#include "assets/dna.h"
 #include "assets/body.h"
 #include "assets/windows.h"
 #include "assets/wheel.h"
@@ -124,6 +125,7 @@ uint keystate[6] = {0};
 ESModel mdlBlueCube;
 ESModel mdlPurpleCube;
 ESModel mdlPorygon;
+ESModel mdlDNA;
 ESModel mdlBody;
 ESModel mdlWindows;
 ESModel mdlWheel;
@@ -157,6 +159,7 @@ vec zd; // direction
 f32 zr; // rotation
 f32 zs; // speed
 double za;// alive state
+f32 zt; // twitch radius
 
 // configurable vars
 f32 maxspeed = 0.006f;
@@ -248,6 +251,25 @@ void timeTaken(uint ss)
 //*************************************
 // render functions
 //*************************************
+void iterDNA()
+{
+    static const uint mi = dna_numvert*3;
+    static uint cd = 0;
+    for(uint i = 0; i < mi; i++) // lavalamp it
+    {
+        if(cd == 0)
+            dna_colors[i] += fRandFloat(63.01f, 63.06f) * dt;
+        else
+            dna_colors[i] -= fRandFloat(63.01f, 63.06f) * dt;
+
+        if(dna_colors[i] >= 1.f)
+            cd = 1;
+        else if(dna_colors[i] <= 0.f)
+            cd = 0;
+    }
+    esRebind(GL_ARRAY_BUFFER, &mdlDNA.cid, dna_colors, sizeof(dna_colors), GL_STATIC_DRAW);
+}
+
 void rCube(f32 x, f32 y)
 {
     mIdent(&model);
@@ -362,6 +384,40 @@ void rPorygon(f32 x, f32 y, f32 r)
     glDrawElements(GL_TRIANGLES, porygon_numind, GL_UNSIGNED_SHORT, 0);
     if(za != 0.0)
         glDisable(GL_BLEND);
+}
+
+void rDNA(f32 x, f32 y, f32 z)
+{
+    bindstate = -1;
+
+    static f32 dr = 0.f;
+    dr += 1.f * dt;
+
+    mIdent(&model);
+    mTranslate(&model, x, y, z);
+    mRotZ(&model, dr);
+    mMul(&modelview, &model, &view);
+
+    glUniform1f(opacity_id, 1.0f);
+
+    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, mdlDNA.cid);
+    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(color_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mdlDNA.vid);
+    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(position_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mdlDNA.nid);
+    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(normal_id);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlDNA.iid);
+
+    glDrawElements(GL_TRIANGLES, dna_numind, GL_UNSIGNED_SHORT, 0);
 }
 
 void rCar(f32 x, f32 y, f32 z, f32 rx)
@@ -584,8 +640,10 @@ void newGame(unsigned int seed)
     sp = 0.f;
 
     zp = (vec){fRandFloat(-18.f, 18.f), fRandFloat(-18.f, 18.f), 0.f};
+    //zp = (vec){0.f, 0.3f, 0.f};
     zs = 0.3f;
     za = 0.0;
+    zt = 8.f;
 }
 
 //*************************************
@@ -702,23 +760,25 @@ void main_loop()
         vec inc;
         vMulS(&inc, zd, zs * dt);
         vAdd(&zp, zp, inc);
-        zr += fRandFloat(-0.08f, 0.08f);
+        zr += fRandFloat(-zt, zt) * dt;
 
-        if(zp.x > 17.5f){zp.x = 17.5f;}
-        else if(zp.x < -17.5f){zp.x = -17.5f;}
-        if(zp.y > 17.5f){zp.y = 17.5f;}
-        else if(zp.y < -17.5f){zp.y = -17.5f;}
+        if(zp.x > 17.5f){zp.x = 17.5f; zr = fRandFloat(-PI, PI);}
+        else if(zp.x < -17.5f){zp.x = -17.5f; zr = fRandFloat(-PI, PI);}
+        if(zp.y > 17.5f){zp.y = 17.5f; zr = fRandFloat(-PI, PI);}
+        else if(zp.y < -17.5f){zp.y = -17.5f; zr = fRandFloat(-PI, PI);}
 
         if(vDist(pp, zp) < 0.1f)
         {
             cp++;
             za = t+6.0;
+            iterDNA();
         }
     }
     else if(t > za)
     {
         zp = (vec){fRandFloat(-18.f, 18.f), fRandFloat(-18.f, 18.f), 0.f};
         zs = fRandFloat(0.3f, 1.f);
+        zt = fRandFloat(8.f, 16.f);
         za = 0.0;
     }
 
@@ -765,6 +825,9 @@ void main_loop()
     // render porygon
     rPorygon(zp.x, zp.y, zr);
 
+    // render dna
+    rDNA(0.f, 0.f, 0.1f);
+
     // render player
     shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
     glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
@@ -805,6 +868,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             // new
             newGame(time(0));
         }
+
+        // else if(key == GLFW_KEY_R)
+        // {
+        //     iterDNA();
+        //     cp++;
+        // }
 
         // stats
         else if(key == GLFW_KEY_P)
@@ -1007,6 +1076,12 @@ int main(int argc, char** argv)
     esBind(GL_ARRAY_BUFFER, &mdlPorygon.nid, porygon_normals, sizeof(porygon_normals), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlPorygon.iid, porygon_indices, sizeof(porygon_indices), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlPorygon.cid, porygon_colors, sizeof(porygon_colors), GL_STATIC_DRAW);
+
+    // ***** BIND DNA *****
+    esBind(GL_ARRAY_BUFFER, &mdlDNA.vid, dna_vertices, sizeof(dna_vertices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlDNA.nid, dna_normals, sizeof(dna_normals), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlDNA.iid, dna_indices, sizeof(dna_indices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlDNA.cid, dna_colors, sizeof(dna_colors), GL_STATIC_DRAW);
 
 //*************************************
 // compile & link shader programs
