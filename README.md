@@ -24,6 +24,21 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
  - `Mouse Click Right` = Zoom Snap Close/Ariel
  - `Middle Scroll` = Zoom in/out
 
+## Configure Car Physics
+It is possible to tweak the car physics by creating a `config.txt` file in the exec/working directory of the game, here is an example of such config file with the default car phsyics variables.
+```
+maxspeed 0.0095
+acceleration 0.0025
+inertia 0.00015
+drag 0.00038
+steeringspeed 1.2
+steerinertia 233
+minsteer 0.32
+maxsteer 0.55
+steeringtransfer 0.019
+steeringtransferinertia 280
+```
+
 ## Downloads
 
 ### Snapcraft
