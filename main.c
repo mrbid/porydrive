@@ -258,9 +258,9 @@ void iterDNA()
     for(uint i = 0; i < mi; i++) // lavalamp it
     {
         if(cd == 0)
-            dna_colors[i] += fRandFloat(63.01f, 63.06f) * dt;
+            dna_colors[i] += fRandFloat(0.1f, 0.6f);
         else
-            dna_colors[i] -= fRandFloat(63.01f, 63.06f) * dt;
+            dna_colors[i] -= fRandFloat(0.1f, 0.6f);
 
         if(dna_colors[i] >= 1.f)
             cd = 1;
