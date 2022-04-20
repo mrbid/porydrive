@@ -162,14 +162,14 @@ double za;// alive state
 f32 zt; // twitch radius
 
 // configurable vars
-f32 maxspeed = 0.006f;
-f32 acceleration = 0.001f;
-f32 inertia = 0.0001f;
+f32 maxspeed = 0.0095f;
+f32 acceleration = 0.0025f;
+f32 inertia = 0.00015f;
 f32 drag = 0.00038f;
 f32 steeringspeed = 1.2f;
 f32 steerinertia = 233.f;
-f32 minsteer = 0.1f;
-f32 maxsteer = 0.7f;
+f32 minsteer = 0.32f;
+f32 maxsteer = 0.55f;
 f32 steeringtransfer = 0.023f;
 f32 steeringtransferinertia = 280.f;
 
