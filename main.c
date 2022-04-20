@@ -873,12 +873,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             newGame(time(0));
         }
 
-        else if(key == GLFW_KEY_R)
-        {
-            printf("%g %g %g\n", dna_colors[0], dna_colors[1], dna_colors[2]);
-            iterDNA();
-            cp++;
-        }
+        // else if(key == GLFW_KEY_R)
+        // {
+        //     printf("%g %g %g\n", dna_colors[0], dna_colors[1], dna_colors[2]);
+        //     iterDNA();
+        //     cp++;
+        // }
 
         // stats
         else if(key == GLFW_KEY_P)
