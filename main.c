@@ -151,6 +151,13 @@ uint cp;// collected porygon count
 double st=0; // start time
 char tts[32];// time taken string
 
+// porygon vars
+vec zp; // position
+vec zd; // direction
+f32 zr; // rotation
+f32 zs; // speed
+double za;// alive state
+
 // configurable vars
 f32 maxspeed = 0.006f;
 f32 acceleration = 0.001f;
@@ -271,7 +278,16 @@ void rCube(f32 x, f32 y)
         bindstate = 1;
     }
 
-    const f32 dla = vDistLa(pp, (vec){x, y, 0.f});
+    const f32 dlap = vDistLa(zp, (vec){x, y, 0.f}); // porygon
+    if(dlap < 0.15f)
+    {
+        vec nf;
+        vSub(&nf, zp, (vec){x, y, 0.f});
+        vNorm(&nf);
+        vMulS(&nf, nf, 0.15f-dlap);
+        vAdd(&zp, zp, nf);
+    }
+    const f32 dla = vDist(pp, (vec){x, y, 0.f}); // car
     if(dla < 0.15f)
     {
         vec nf;
@@ -280,7 +296,7 @@ void rCube(f32 x, f32 y)
         vMulS(&nf, nf, fabsf(sp)); //dla*sp*10.f
         vAdd(&pv, pv, nf);
     }
-    if(dla < 0.16f && bindstate != 2) // realistically only one can light up at a time
+    if((dla < 0.16f || dlap < 0.16f) && bindstate != 2)
     {
         glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.cid);
         glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -300,6 +316,52 @@ void rCube(f32 x, f32 y)
     }
 
     glDrawElements(GL_TRIANGLES, purplecube_numind, GL_UNSIGNED_SHORT, 0);
+}
+
+void rPorygon(f32 x, f32 y, f32 r)
+{
+    bindstate = -1;
+
+    mIdent(&model);
+    mTranslate(&model, x, y, 0.f);
+    mRotZ(&model, r);
+
+    if(za != 0.0)
+        mScale(&model, 1.f, 1.f, 0.1f);
+
+    mMul(&modelview, &model, &view);
+
+    // returns direction
+    mGetDirY(&zd, model);
+    vInv(&zd);
+
+    if(za != 0.0)
+        glUniform1f(opacity_id, (za-t)/6.0);
+    else
+        glUniform1f(opacity_id, 1.0f);
+
+    glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
+    glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, mdlPorygon.cid);
+    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(color_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mdlPorygon.vid);
+    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(position_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mdlPorygon.nid);
+    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(normal_id);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPorygon.iid);
+
+    if(za != 0.0)
+        glEnable(GL_BLEND);
+    glDrawElements(GL_TRIANGLES, porygon_numind, GL_UNSIGNED_SHORT, 0);
+    if(za != 0.0)
+        glDisable(GL_BLEND);
 }
 
 void rCar(f32 x, f32 y, f32 z, f32 rx)
@@ -520,6 +582,10 @@ void newGame(unsigned int seed)
     pr = 0.f;
     sr = 0.f;
     sp = 0.f;
+
+    zp = (vec){fRandFloat(-18.f, 18.f), fRandFloat(-18.f, 18.f), 0.f};
+    zs = 0.3f;
+    za = 0.0;
 }
 
 //*************************************
@@ -591,16 +657,16 @@ void main_loop()
     {
         timeTaken(1);
         char title[256];
-        sprintf(title, "| %s | Porygon %u |", tts, cp);
-        sprintf(title, "| %s | Porygon %u |", tts, cp);
+        const f32 dsp = fabsf(sp*(1.f/maxspeed)*130.f);
+        sprintf(title, "| %s | Speed %.f MPH | Porygon %u |", tts, dsp, cp);
+        sprintf(title, "| %s | Speed %.f MPH | Porygon %u |", tts, dsp, cp);
         glfwSetWindowTitle(window, title);
-        ltut = t + 3.0;
+        ltut = t + 1.0;
     }
 
 //*************************************
 // simulate car
 //*************************************
-    //printf("Speed: %f\n", sp);
 
     if(sp > 0.f)
         sp -= drag * dt;
@@ -620,6 +686,40 @@ void main_loop()
         vAdd(&pp, pp, pv);
         vMulS(&pv, pd, sp);
         pr -= sr * steeringtransfer * (sp*steeringtransferinertia);
+    }
+
+    if(pp.x > 17.5f){pp.x = 17.5f;}
+    else if(pp.x < -17.5f){pp.x = -17.5f;}
+    if(pp.y > 17.5f){pp.y = 17.5f;}
+    else if(pp.y < -17.5f){pp.y = -17.5f;}
+
+//*************************************
+// simulate porygon
+//*************************************
+
+    if(za == 0.0)
+    {
+        vec inc;
+        vMulS(&inc, zd, zs * dt);
+        vAdd(&zp, zp, inc);
+        zr += fRandFloat(-0.08f, 0.08f);
+
+        if(zp.x > 17.5f){zp.x = 17.5f;}
+        else if(zp.x < -17.5f){zp.x = -17.5f;}
+        if(zp.y > 17.5f){zp.y = 17.5f;}
+        else if(zp.y < -17.5f){zp.y = -17.5f;}
+
+        if(vDist(pp, zp) < 0.1f)
+        {
+            cp++;
+            za = t+6.0;
+        }
+    }
+    else if(t > za)
+    {
+        zp = (vec){fRandFloat(-18.f, 18.f), fRandFloat(-18.f, 18.f), 0.f};
+        zs = fRandFloat(0.3f, 1.f);
+        za = 0.0;
     }
 
 //*************************************
@@ -657,10 +757,13 @@ void main_loop()
 //*************************************
 
     // render scene
-    for(f32 i = -9.f; i < 18.f; i += 0.53f)
-        for(f32 j = -9.f; j < 18.f; j += 0.53f)
+    for(f32 i = -17.5f; i <= 18.f; i += 0.53f)
+        for(f32 j = -17.5f; j <= 18.f; j += 0.53f)
             if((i < -0.1f || i > 0.1f) || (j < -0.1f || j > 0.1f)) // lol a branch for so little tut tut
                 rCube(i, j);
+
+    // render porygon
+    rPorygon(zp.x, zp.y, zr);
 
     // render player
     shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
@@ -749,17 +852,26 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     if(yoffset == -1)
-        zoom -= 0.01f;
+        zoom += 0.06f * zoom;
     else if(yoffset == 1)
-        zoom += 0.01f;
+        zoom -= 0.06f * zoom;
     
     if(zoom > -0.11f){zoom = -0.11f;}
 }
 
-// void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-// {
-//     //
-// }
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if(action == GLFW_PRESS)
+    {
+        if(button == GLFW_MOUSE_BUTTON_4 || button == GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            if(zoom != -0.3f)
+                zoom = -0.3f;
+            else
+                zoom = -3.3f;
+        }
+    }
+}
 
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -812,6 +924,7 @@ int main(int argc, char** argv)
     printf("Space = Break\n");
     printf("----\n");
     printf("~ Mouse Input:\n");
+    printf("RIGHT/MOUSE4 = Zoom Snap Close/Ariel\n");
     printf("Scroll = Zoom in/out\n");
     printf("----\n");
 
@@ -830,7 +943,7 @@ int main(int argc, char** argv)
     glfwSetWindowPos(window, (desktop->width/2)-(winw/2), (desktop->height/2)-(winh/2)); // center window on desktop
     glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetKeyCallback(window, key_callback);
-    //glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwMakeContextCurrent(window);
     gladLoadGL(glfwGetProcAddress);
@@ -885,6 +998,12 @@ int main(int argc, char** argv)
     esBind(GL_ARRAY_BUFFER, &mdlBlueCube.nid, bluecube_normals, sizeof(bluecube_normals), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlBlueCube.iid, bluecube_indices, sizeof(bluecube_indices), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlBlueCube.cid, bluecube_colors, sizeof(bluecube_colors), GL_STATIC_DRAW);
+
+    // ***** BIND PORYGON *****
+    esBind(GL_ARRAY_BUFFER, &mdlPorygon.vid, porygon_vertices, sizeof(porygon_vertices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlPorygon.nid, porygon_normals, sizeof(porygon_normals), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlPorygon.iid, porygon_indices, sizeof(porygon_indices), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlPorygon.cid, porygon_colors, sizeof(porygon_colors), GL_STATIC_DRAW);
 
 //*************************************
 // compile & link shader programs
