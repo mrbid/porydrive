@@ -45,6 +45,7 @@ https://github.com/mrbid/porydrive/raw/main/glfw3.dll
 ## Attributions
 https://downloadfree3d.com/3d-models/vehicles/car/bmw-e34/<br>
 https://www.cgtrader.com/free-3d-models/character/fantasy-character/porygon<br>
+https://www.cgtrader.com/free-3d-models/science/laboratory/dna-molecule-3d-model<br>
 https://pixels.com/featured/1-bmw-m5-e34-tuning-bmw-5-series-tunned-m5-hervey-dopson.html<br>
 https://gamerant.com/pokemon-sword-shield-porygon-porygon2-porygonz-isle-of-armor-dlc/ [**[`src`]**](https://www.pokemon.com/uk/pokemon-tcg/pokemon-cards/sm-series/sm10/155/)<br>
 http://www.forrestwalter.com/icons/<br>
