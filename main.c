@@ -531,7 +531,8 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     // wheel spin speed
     static f32 wr = 0.f;
     const f32 speed = sp * 33.f;
-    wr += speed;
+    if(sp > inertia || sp < -inertia)
+        wr += speed;
 
     // wheel; front left
     mIdent(&model);
