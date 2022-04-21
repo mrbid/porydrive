@@ -176,12 +176,26 @@ f32 steeringtransferinertia = 280.f;
 //*************************************
 // utility functions
 //*************************************
-void loadConfig()
+void timestamp(char* ts)
+{
+    const time_t tt = time(0);
+    strftime(ts, 16, "%H:%M:%S", localtime(&tt));
+}
+
+void loadConfig(uint type)
 {
     FILE* f = fopen("config.txt", "r");
     if(f)
     {
-        printf("\nDetected config.txt loading settings...\n");
+        if(type == 1)
+        {
+            char strts[16];
+            timestamp(&strts[0]);
+            printf("[%s] CONFIG: config.txt loaded.\n", strts);
+        }
+        else
+            printf("\nDetected config.txt loading settings...\n");
+
         char line[256];
         while(fgets(line, 256, f) != NULL)
         {
@@ -191,7 +205,8 @@ void loadConfig()
             
             if(sscanf(line, "%63s %f", set, &val) == 2)
             {
-                printf("Setting Loaded: %s %g\n", set, val);
+                if(type == 0)
+                    printf("Setting Loaded: %s %g\n", set, val);
 
                 if(strcmp(set, "maxspeed") == 0){maxspeed = val;}
                 if(strcmp(set, "acceleration") == 0){acceleration = val;}
@@ -207,12 +222,15 @@ void loadConfig()
         }
         fclose(f);
     }
-}
-
-void timestamp(char* ts)
-{
-    const time_t tt = time(0);
-    strftime(ts, 16, "%H:%M:%S", localtime(&tt));
+    else
+    {
+        if(type == 1)
+        {
+            char strts[16];
+            timestamp(&strts[0]);
+            printf("[%s] CONFIG: No config.txt file detected.\n", strts);
+        }
+    }
 }
 
 static inline f32 fRandFloat(const float min, const float max)
@@ -246,6 +264,78 @@ void timeTaken(uint ss)
         else if(tt < 12960000.0)
             sprintf(tts, "%.2f Days", tt * 0.00000463);
     }
+}
+
+void configOriginal()
+{
+    maxspeed = 0.006f;
+    acceleration = 0.001f;
+    inertia = 0.0001f;
+    drag = 0.00038f;
+    steeringspeed = 1.2f;
+    steerinertia = 233.f;
+    minsteer = 0.1f;
+    maxsteer = 0.7f;
+    steeringtransfer = 0.023f;
+    steeringtransferinertia = 280.f;
+
+    char strts[16];
+    timestamp(&strts[0]);
+    printf("[%s] CONFIG: Original.\n", strts);
+}
+
+void configScarlet()
+{
+    maxspeed = 0.0095f;
+    acceleration = 0.0025f;
+    inertia = 0.00015f;
+    drag = 0.00038f;
+    steeringspeed = 1.2f;
+    steerinertia = 233.f;
+    minsteer = 0.32f;
+    maxsteer = 0.55f;
+    steeringtransfer = 0.023f;
+    steeringtransferinertia = 280.f;
+    
+    char strts[16];
+    timestamp(&strts[0]);
+    printf("[%s] CONFIG: Scarlet.\n", strts);
+}
+
+void configScarlet2()
+{
+    maxspeed = 0.0165f;
+    acceleration = 0.0028f;
+    inertia = 0.00022f;
+    drag = 0.00038f;
+    steeringspeed = 1.4f;
+    steerinertia = 180.f;
+    minsteer = 0.16f;
+    maxsteer = 0.45f;
+    steeringtransfer = 0.019f;
+    steeringtransferinertia = 280.f;
+    
+    char strts[16];
+    timestamp(&strts[0]);
+    printf("[%s] CONFIG: Scarlet2.\n", strts);
+}
+
+void configHybrid()
+{
+    maxspeed = 0.0165f;
+    acceleration = 0.0028f;
+    inertia = 0.00022f;
+    drag = 0.00038f;
+    steeringspeed = 3.2f;
+    steerinertia = 233.f;
+    minsteer = 0.1f;
+    maxsteer = 0.2f;
+    steeringtransfer = 0.023f;
+    steeringtransferinertia = 280.f;
+    
+    char strts[16];
+    timestamp(&strts[0]);
+    printf("[%s] CONFIG: Hybrid.\n", strts);
 }
 
 //*************************************
@@ -623,7 +713,7 @@ void newGame(unsigned int seed)
     srand(seed);
     srandf(seed);
 
-    loadConfig();
+    loadConfig(0);
 
     char strts[16];
     timestamp(&strts[0]);
@@ -899,6 +989,20 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             glfwSetCursorPos(window, ww2, wh2);
             glfwGetCursorPos(window, &ww2, &wh2);
         }
+
+        // physics types
+        else if(key == GLFW_KEY_1)
+            configOriginal();
+        else if(key == GLFW_KEY_2)
+            configScarlet();
+        else if(key == GLFW_KEY_3)
+            configScarlet2();
+        else if(key == GLFW_KEY_4)
+            configHybrid();
+        else if(key == GLFW_KEY_5)
+            loadConfig(1);
+        // else if(key == GLFW_KEY_LEFT_SHIFT)
+        //     configOriginal();
     }
     else if(action == GLFW_RELEASE)
     {
@@ -907,10 +1011,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_W){ keystate[2] = 0; }
         else if(key == GLFW_KEY_S){ keystate[3] = 0; }
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 0; }
+        // else if(key == GLFW_KEY_LEFT_SHIFT)
+        //     configScarlet2();
     }
 
     // show average fps
-    if(key == GLFW_KEY_F)
+    else if(key == GLFW_KEY_F)
     {
         if(t-lfct > 2.0)
         {
@@ -996,6 +1102,7 @@ int main(int argc, char** argv)
     printf("S = Drive Backward\n");
     printf("D = Turn Right\n");
     printf("Space = Break\n");
+    printf("1-5 = Car Physics config selection (5 loads from file)\n");
     printf("----\n");
     printf("~ Mouse Input:\n");
     printf("RIGHT/MOUSE4 = Zoom Snap Close/Ariel\n");
@@ -1004,6 +1111,23 @@ int main(int argc, char** argv)
     printf("~ How to play:\n");
     printf("Drive around and \"collect\" Porygon, each time you collect a Porygon a new one will randomly spawn somewhere on the map. A Porygon colliding with a purple cube will cause it to light up blue, this can help you find them. Upon right clicking the mouse you will switch between Ariel and Close views, in the Ariel view it is easier to see which of the purple cubes that the Porygon is colliding with.\n");
     printf("----\n");
+    printf("~ Create custom car physics:\n");
+    printf("It is possible to tweak the car physics by creating a config.txt file in the exec/working directory of the game, here is an example of such config file with the default car phsyics variables.\n");
+    printf("~ config.txt:\n");
+    printf("maxspeed 0.0095\n");
+    printf("acceleration 0.0025\n");
+    printf("inertia 0.00015\n");
+    printf("drag 0.00038\n");
+    printf("steeringspeed 1.2\n");
+    printf("steerinertia 233\n");
+    printf("minsteer 0.32\n");
+    printf("maxsteer 0.55\n");
+    printf("steeringtransfer 0.023\n");
+    printf("steeringtransferinertia 280\n");
+    printf("----\n");
+    
+
+
 
     // init glfw
     if(!glfwInit()){exit(EXIT_FAILURE);}
@@ -1112,6 +1236,7 @@ int main(int argc, char** argv)
 
     // init
     newGame(NEWGAME_SEED);
+    configScarlet();
 
     // reset
     t = glfwGetTime();
