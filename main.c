@@ -173,6 +173,8 @@ f32 maxsteer = 0.45f;
 f32 steeringtransfer = 0.019f;
 f32 steeringtransferinertia = 280.f;
 
+char cname[256] = {0};
+
 //*************************************
 // utility functions
 //*************************************
@@ -187,6 +189,8 @@ void loadConfig(uint type)
     FILE* f = fopen("config.txt", "r");
     if(f)
     {
+        sprintf(cname, "config.txt");
+        
         if(type == 1)
         {
             char strts[16];
@@ -281,7 +285,8 @@ void configOriginal()
 
     char strts[16];
     timestamp(&strts[0]);
-    printf("[%s] CONFIG: Original.\n", strts);
+    sprintf(cname, "Original");
+    printf("[%s] CONFIG: %s.\n", strts, cname);
 }
 
 void configScarlet()
@@ -299,7 +304,8 @@ void configScarlet()
     
     char strts[16];
     timestamp(&strts[0]);
-    printf("[%s] CONFIG: Scarlet.\n", strts);
+    sprintf(cname, "Scarlet");
+    printf("[%s] CONFIG: %s.\n", strts, cname);
 }
 
 void configScarlet2()
@@ -317,7 +323,8 @@ void configScarlet2()
     
     char strts[16];
     timestamp(&strts[0]);
-    printf("[%s] CONFIG: Scarlet2.\n", strts);
+    sprintf(cname, "ScarletFast");
+    printf("[%s] CONFIG: %s.\n", strts, cname);
 }
 
 void configHybrid()
@@ -335,7 +342,8 @@ void configHybrid()
     
     char strts[16];
     timestamp(&strts[0]);
-    printf("[%s] CONFIG: Hybrid.\n", strts);
+    sprintf(cname, "Hybrid");
+    printf("[%s] CONFIG: %s.\n", strts, cname);
 }
 
 //*************************************
@@ -713,8 +721,6 @@ void newGame(unsigned int seed)
     srand(seed);
     srandf(seed);
 
-    loadConfig(0);
-
     char strts[16];
     timestamp(&strts[0]);
     printf("\n[%s] Game Start [%u].\n", strts, seed);
@@ -810,8 +816,7 @@ void main_loop()
         timeTaken(1);
         char title[256];
         const f32 dsp = fabsf(sp*(1.f/maxspeed)*130.f);
-        sprintf(title, "| %s | Speed %.f MPH | Porygon %u |", tts, dsp, cp);
-        sprintf(title, "| %s | Speed %.f MPH | Porygon %u |", tts, dsp, cp);
+        sprintf(title, "| %s | Speed %.f MPH | Porygon %u | %s", tts, dsp, cp, cname);
         glfwSetWindowTitle(window, title);
         ltut = t + 1.0;
     }
@@ -1125,9 +1130,6 @@ int main(int argc, char** argv)
     printf("steeringtransfer 0.023\n");
     printf("steeringtransferinertia 280\n");
     printf("----\n");
-    
-
-
 
     // init glfw
     if(!glfwInit()){exit(EXIT_FAILURE);}
@@ -1235,8 +1237,9 @@ int main(int argc, char** argv)
 //*************************************
 
     // init
-    newGame(NEWGAME_SEED);
     configScarlet();
+    loadConfig(0);
+    newGame(NEWGAME_SEED);
 
     // reset
     t = glfwGetTime();
