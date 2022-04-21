@@ -142,7 +142,6 @@ f32 yrot = 1.7f;
 f32 zoom = -0.3f;
 
 // player vars
-uint pg;// gear
 f32 pr; // rotation
 f32 sr; // steering rotation
 vec pp; // position
@@ -532,10 +531,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     // wheel spin speed
     static f32 wr = 0.f;
     const f32 speed = sp * 33.f;
-    if(pg == 0)
-        wr += speed;
-    else
-        wr -= speed;
+    wr += speed;
 
     // wheel; front left
     mIdent(&model);
@@ -734,7 +730,6 @@ void newGame(unsigned int seed)
     st = 0;
 
     cp = 0;
-    pg = 0;
     pr = 0.f;
     sr = 0.f;
     sp = 0.f;
@@ -790,7 +785,6 @@ void main_loop()
         sp += acceleration * dt;
         vMulS(&inc, pd, acceleration * dt);
         vAdd(&pv, pv, inc);
-        pg = 0;
     }
 
     if(keystate[3] == 1)
@@ -799,7 +793,6 @@ void main_loop()
         sp -= acceleration * dt;
         vMulS(&inc, pd, -acceleration * dt);
         vAdd(&pv, pv, inc);
-        pg = 1;
     }
 
     if(keystate[4] == 1)
@@ -832,7 +825,7 @@ void main_loop()
 
     if(fabsf(sp) > maxspeed)
     {
-        if(pg == 0)
+        if(sp > 0.f)
             sp = maxspeed;
         else
             sp = -maxspeed;
