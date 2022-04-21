@@ -18,6 +18,7 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
  - `S` = Drive Backward
  - `D` = Turn Right
  - `Space` = Breaks
+ - `1-5` = Car Physics config selection _(5 loads from file)_
 
 ## Mouse
  - `Mouse Button4` = Zoom Snap Close/Ariel
