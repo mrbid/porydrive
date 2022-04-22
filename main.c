@@ -18,10 +18,12 @@
         S = Drive Backward
         D = Turn Right
         Space = Breaks
+        1-5 = Car Physics config selection (5 loads from file)
 
 
     Mouse:
 
+        RIGHT CLICK/MOUSE4 = Zoom Snap Close/Ariel
         Scroll = Zoom in/out
 
     
@@ -307,7 +309,7 @@ void configScarlet()
     printf("[%s] CONFIG: %s.\n", strts, cname);
 }
 
-void configScarlet2()
+void configScarletFast()
 {
     maxspeed = 0.0165f;
     acceleration = 0.0028f;
@@ -349,6 +351,23 @@ void configHybrid()
 // render functions
 //*************************************
 
+__attribute__((always_inline)) inline void modelBind(const ESModel* mdl) // code reduction helper
+{
+    glBindBuffer(GL_ARRAY_BUFFER, mdl->cid);
+    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(color_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mdl->vid);
+    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(position_id);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mdl->nid);
+    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(normal_id);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdl->iid);
+}
+
 void iterDNA()
 {
     // so that you don't get confused I am exploiting the
@@ -384,23 +403,11 @@ void rCube(f32 x, f32 y)
     
     if(bindstate != 1)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.cid);
-        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(color_id);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.vid);
-        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(position_id);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.nid);
-        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(normal_id);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPurpleCube.iid);
-        
+        modelBind(&mdlPurpleCube);
         bindstate = 1;
     }
 
+    // cube collisions
     const f32 dlap = vDistLa(zp, (vec){x, y, 0.f}); // porygon
     if(dlap < 0.15f)
     {
@@ -421,20 +428,7 @@ void rCube(f32 x, f32 y)
     }
     if((dla < 0.16f || dlap < 0.16f) && bindstate != 2)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.cid);
-        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(color_id);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.vid);
-        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(position_id);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCube.nid);
-        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(normal_id);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlBlueCube.iid);
-
+        modelBind(&mdlBlueCube);
         bindstate = 2;
     }
 
@@ -465,20 +459,8 @@ void rPorygon(f32 x, f32 y, f32 r)
 
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
     glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, mdlPorygon.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
 
-    glBindBuffer(GL_ARRAY_BUFFER, mdlPorygon.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlPorygon.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPorygon.iid);
+    modelBind(&mdlPorygon);
 
     if(za != 0.0)
         glEnable(GL_BLEND);
@@ -504,19 +486,7 @@ void rDNA(f32 x, f32 y, f32 z)
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
     glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
     
-    glBindBuffer(GL_ARRAY_BUFFER, mdlDNA.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlDNA.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlDNA.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlDNA.iid);
+    modelBind(&mdlDNA);
 
     glDrawElements(GL_TRIANGLES, dna_numind, GL_UNSIGNED_SHORT, 0);
 }
@@ -551,19 +521,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
     glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
     
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlWheel.iid);
+    modelBind(&mdlWheel);
 
     glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
@@ -579,19 +537,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
     glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
     
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlWheel.iid);
+    modelBind(&mdlWheel);
 
     glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
@@ -609,19 +555,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
     glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
     
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlWheel.iid);
+    modelBind(&mdlWheel);
 
     glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
@@ -638,19 +572,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
     glUniformMatrix4fv(modelview_id, 1, GL_FALSE, (f32*) &modelview.m[0][0]);
     
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWheel.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlWheel.iid);
+    modelBind(&mdlWheel);
 
     glDrawElements(GL_TRIANGLES, wheel_numind, GL_UNSIGNED_SHORT, 0);
 
@@ -666,19 +588,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     
     // body
 
-    glBindBuffer(GL_ARRAY_BUFFER, mdlBody.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlBody.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlBody.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlBody.iid);
+    modelBind(&mdlBody);
 
     glDisable(GL_CULL_FACE);
     glDrawElements(GL_TRIANGLES, body_numind, GL_UNSIGNED_SHORT, 0);
@@ -689,19 +599,7 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
 
     // windows
 
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWindows.cid);
-    glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(color_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWindows.vid);
-    glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(position_id);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mdlWindows.nid);
-    glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(normal_id);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlWindows.iid);
+    modelBind(&mdlWindows);
 
     glEnable(GL_BLEND);
     glDepthMask(GL_FALSE);
@@ -995,7 +893,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_2)
             configScarlet();
         else if(key == GLFW_KEY_3)
-            configScarlet2();
+            configScarletFast();
         else if(key == GLFW_KEY_4)
             configHybrid();
         else if(key == GLFW_KEY_5)
@@ -1011,7 +909,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_S){ keystate[3] = 0; }
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 0; }
         // else if(key == GLFW_KEY_LEFT_SHIFT)
-        //     configScarlet2();
+        //     configScarletFast();
     }
 
     // show average fps
