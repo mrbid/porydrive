@@ -900,6 +900,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             loadConfig(1);
         // else if(key == GLFW_KEY_LEFT_SHIFT)
         //     configOriginal();
+
+        // show average fps
+        else if(key == GLFW_KEY_F)
+        {
+            if(t-lfct > 2.0)
+            {
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] FPS: %g\n", strts, fc/(t-lfct));
+                lfct = t;
+                fc = 0;
+            }
+        }
     }
     else if(action == GLFW_RELEASE)
     {
@@ -910,19 +923,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 0; }
         // else if(key == GLFW_KEY_LEFT_SHIFT)
         //     configScarletFast();
-    }
-
-    // show average fps
-    else if(key == GLFW_KEY_F)
-    {
-        if(t-lfct > 2.0)
-        {
-            char strts[16];
-            timestamp(&strts[0]);
-            printf("[%s] FPS: %g\n", strts, fc/(t-lfct));
-            lfct = t;
-            fc = 0;
-        }
     }
 }
 
