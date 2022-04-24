@@ -39,16 +39,16 @@ maxsteer 0.55
 steeringtransfer 0.019
 steeringtransferinertia 280
 ```
-- maxspeed: top travel speed of car.
-- acceleration: increase of speed with respect to time.
-- inertia: minimum speed before car will move from stationary state.
-- drag: loss in speed with respect to time.
-- steeringspeed: how fast the wheels turn.
-- steerinertia: how much of the max steering angle is lost as the car increases in speed _(crude steering loss)_.
-- minsteer: minimum steering angle in radians attainable after steering loss caused by `steeringintertia`.
-- maxsteer: maximum steering angle in radians attainable at minimal speeds.
-- steeringtransfer: how much the wheel rotation angle translates into rotation of the body the wheels are connected to _(the car)_.
-- steeringtransferinertia: how much the `steeringtransfer` reduces as the car speed increases, this is related to `steerinertia` to give the crude effect of traction loss of the front tires as speed increases and the inability to force the wheels into a wider angle at higher speeds.
+- `maxspeed`: top travel speed of car.
+- `acceleration`: increase of speed with respect to time.
+- `inertia`: minimum speed before car will move from stationary state.
+- `drag`: loss in speed with respect to time.
+- `steeringspeed`: how fast the wheels turn.
+- `steerinertia`: how much of the max steering angle is lost as the car increases in speed _(crude steering loss)_.
+- `minsteer`: minimum steering angle in radians attainable after steering loss caused by `steeringintertia`.
+- `maxsteer`: maximum steering angle in radians attainable at minimal speeds.
+- `steeringtransfer`: how much the wheel rotation angle translates into rotation of the body the wheels are connected to _(the car)_.
+- `steeringtransferinertia`: how much the `steeringtransfer` reduces as the car speed increases, this is related to `steerinertia` to give the crude effect of traction loss of the front tires as speed increases and the inability to force the wheels into a wider angle at higher speeds.
 
 ## Downloads
 
