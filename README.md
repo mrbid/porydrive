@@ -41,7 +41,7 @@ steeringtransferinertia 280
 ```
 - `maxspeed`: top travel speed of car.
 - `acceleration`: increase of speed with respect to time.
-- `inertia`: minimum speed before car will move from stationary state.
+- `inertia`: minimum speed before car will move from a stationary state.
 - `drag`: loss in speed with respect to time.
 - `steeringspeed`: how fast the wheels turn.
 - `steerinertia`: how much of the max steering angle is lost as the car increases in speed _(crude steering loss)_.
