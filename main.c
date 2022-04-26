@@ -581,6 +581,14 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mIdent(&model);
     mTranslate(&model, x, y, z);
     mRotZ(&model, -rx);
+    f32 sy = sp*3.f; // lol speed based and not torque (it will do for now)
+    if(sy > 0.03f){sy = 0.03f;}
+    if(sy < -0.03f){sy = -0.03f;}
+    mRotY(&model, sy);
+    f32 sx = sr*10.f*sp; // turning suspension
+    if(sx > 0.03f){sx = 0.03f;}
+    if(sx < -0.03f){sx = -0.03f;}
+    mRotX(&model, sx);
     mMul(&modelview, &model, &view);
 
     glUniformMatrix4fv(projection_id, 1, GL_FALSE, (f32*) &projection.m[0][0]);
@@ -672,10 +680,12 @@ void main_loop()
 
     if(keystate[0] == 0 && keystate[1] == 0)
     {
-        if(sr > 0.001f)
+        if(sr > 0.006f)
             sr -= steeringspeed * dt;
-        else if(sr < -0.001f)
+        else if(sr < -0.006f)
             sr += steeringspeed * dt;
+        else
+            sr = 0.f;
     }
     
     if(keystate[2] == 1)
