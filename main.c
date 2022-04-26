@@ -585,9 +585,9 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     if(sy > 0.03f){sy = 0.03f;}
     if(sy < -0.03f){sy = -0.03f;}
     mRotY(&model, sy);
-    f32 sx = sr*10.f*sp; // turning suspension
-    if(sx > 0.03f){sx = 0.03f;}
-    if(sx < -0.03f){sx = -0.03f;}
+    f32 sx = sr*30.f*sp; // turning suspension
+    // if(sx > 0.03f){sx = 0.03f;}
+    // if(sx < -0.03f){sx = -0.03f;}
     mRotX(&model, sx);
     mMul(&modelview, &model, &view);
 
