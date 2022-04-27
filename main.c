@@ -429,24 +429,25 @@ void rCube(f32 x, f32 y)
         vAdd(&zp, zp, nf);
     }
 
-    // front collision cube point
-    vec cp1 = pp;
-    vec cd1 = pbd;
-    vMulS(&cd1, cd1, 0.0525f);
-    vAdd(&cp1, cp1, cd1);
-
-    // back collision cube point
-    vec cp2 = pp;
-    vec cd2 = pbd;
-    vMulS(&cd2, cd2, -0.0525f);
-    vAdd(&cp2, cp2, cd2);
-
     //printf("pp: %f %f - %f\n", pp.x, pp.y, t);
     //printf("pv: %f %f - %f\n", pv.x, pv.y, t);
 
-    // do Axis-Aligned Cube collisions for both points against rCube() being rendered
+    // if car is moving compute collisions
     if(sp > inertia || sp < -inertia)
     {
+        // front collision cube point
+        vec cp1 = pp;
+        vec cd1 = pbd;
+        vMulS(&cd1, cd1, 0.0525f);
+        vAdd(&cp1, cp1, cd1);
+
+        // back collision cube point
+        vec cp2 = pp;
+        vec cd2 = pbd;
+        vMulS(&cd2, cd2, -0.0525f);
+        vAdd(&cp2, cp2, cd2);
+
+        // do Axis-Aligned Cube collisions for points against rCube() being rendered
         const f32 dla1 = vDistLa(cp1, (vec){x, y, 0.f}); // front car
         const f32 dla0 = vDistLa(pp, (vec){x, y, 0.f}); // center car
         const f32 dla2 = vDistLa(cp2, (vec){x, y, 0.f}); // back car
