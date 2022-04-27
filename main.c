@@ -78,7 +78,6 @@
 #include "esAux2.h"
 
 #include "res.h"
-#include "assets/bluecube.h"
 #include "assets/purplecube.h"
 #include "assets/porygon.h"
 #include "assets/dna.h"
@@ -123,9 +122,10 @@ vec lightpos = {0.f, 0.f, 0.f};
 
 // models
 sint bindstate = -1;
+sint bindstate2 = -1;
 uint keystate[6] = {0};
-ESModel mdlBlueCube;
 ESModel mdlPurpleCube;
+GLuint mdlBlueCubeColors;
 ESModel mdlPorygon;
 ESModel mdlDNA;
 ESModel mdlBody;
@@ -404,8 +404,18 @@ void rCube(f32 x, f32 y)
     
     if(bindstate != 1)
     {
-        modelBind(&mdlPurpleCube);
+        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.vid);
+        glVertexAttribPointer(position_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(position_id);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.nid);
+        glVertexAttribPointer(normal_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(normal_id);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mdlPurpleCube.iid);
+
         bindstate = 1;
+        bindstate2 = -1;
     }
 
     // cube collisions
@@ -444,11 +454,20 @@ void rCube(f32 x, f32 y)
     }
 
     // also check to see if cube needs to be blue
-    if(((dla1 < 0.11f || dla2 < 0.11f) || dlap < 0.16f) && bindstate != 2)
+    const uint collision = ((dla1 < 0.11f || dla2 < 0.11f) || dlap < 0.16f);
+    if(collision == 1 && bindstate2 <= 1)
     {
-        // cant just bind the colors here because the two models had different orders, doh, no biggie.
-        modelBind(&mdlBlueCube);
-        bindstate = 2;
+        glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCubeColors);
+        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(color_id);
+        bindstate2 = 2;
+    }
+    else if(collision == 0 && bindstate2 != 1)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, mdlPurpleCube.cid);
+        glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(color_id);
+        bindstate2 = 1;
     }
 
     glDrawElements(GL_TRIANGLES, purplecube_numind, GL_UNSIGNED_SHORT, 0);
@@ -1136,12 +1155,7 @@ int main(int argc, char** argv)
     esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.nid, purplecube_normals, sizeof(purplecube_normals), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.iid, purplecube_indices, sizeof(purplecube_indices), GL_STATIC_DRAW);
     esBind(GL_ARRAY_BUFFER, &mdlPurpleCube.cid, purplecube_colors, sizeof(purplecube_colors), GL_STATIC_DRAW);
-
-    // ***** BIND BLUE CUBE *****
-    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.vid, bluecube_vertices, sizeof(bluecube_vertices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.nid, bluecube_normals, sizeof(bluecube_normals), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.iid, bluecube_indices, sizeof(bluecube_indices), GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &mdlBlueCube.cid, bluecube_colors, sizeof(bluecube_colors), GL_STATIC_DRAW);
+    esBind(GL_ARRAY_BUFFER, &mdlBlueCubeColors, bluecube_colors, sizeof(bluecube_colors), GL_STATIC_DRAW);
 
     // ***** BIND PORYGON *****
     esBind(GL_ARRAY_BUFFER, &mdlPorygon.vid, porygon_vertices, sizeof(porygon_vertices), GL_STATIC_DRAW);
