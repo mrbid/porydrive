@@ -319,8 +319,8 @@ void configScarletFast()
     steeringspeed = 1.4f;
     steerinertia = 180.f;
     minsteer = 0.16f;
-    maxsteer = 0.45f;
-    steeringtransfer = 0.019f;
+    maxsteer = 0.3f;
+    steeringtransfer = 0.023f;
     steeringtransferinertia = 280.f;
     
     char strts[16];
@@ -441,16 +441,30 @@ void rCube(f32 x, f32 y)
     vMulS(&cd2, cd2, -0.0525f);
     vAdd(&cp2, cp2, cd2);
 
+    //printf("pp: %f %f - %f\n", pp.x, pp.y, t);
+    //printf("pv: %f %f - %f\n", pv.x, pv.y, t);
+
     // do Axis-Aligned Cube collisions for both points against rCube() being rendered
-    const f32 dla1 = vDistLa(cp1, (vec){x, y, 0.f}); // front car
-    const f32 dla2 = vDistLa(cp2, (vec){x, y, 0.f}); // back car
-    if(dla1 < 0.1f || dla2 < 0.1f)
+    if(sp > inertia || sp < -inertia)
     {
-        vec nf;
-        vSub(&nf, pp, (vec){x, y, 0.f});
-        vNorm(&nf);
-        vMulS(&nf, nf, fabsf(sp)); //dla*sp*10.f
-        vAdd(&pv, pv, nf);
+        const f32 dla1 = vDistLa(cp1, (vec){x, y, 0.f}); // front car
+        const f32 dla2 = vDistLa(cp2, (vec){x, y, 0.f}); // back car
+        if(dla1 <= 0.097f)
+        {
+            vec nf;
+            vSub(&nf, pp, (vec){x, y, 0.f});
+            vNorm(&nf);
+            vMulS(&nf, nf, 0.097f-dla1);
+            vAdd(&pv, pv, nf);
+        }
+        else if(dla2 <= 0.097f)
+        {
+            vec nf;
+            vSub(&nf, pp, (vec){x, y, 0.f});
+            vNorm(&nf);
+            vMulS(&nf, nf, 0.097f-dla2);
+            vAdd(&pv, pv, nf);
+        }
     }
 
     // also check to see if cube needs to be blue
@@ -908,8 +922,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     // control
     if(action == GLFW_PRESS)
     {
-        if(key == GLFW_KEY_A){ keystate[0] = 1; }
-        else if(key == GLFW_KEY_D){ keystate[1] = 1; }
+        if(key == GLFW_KEY_A){ keystate[0] = 1; keystate[1] = 0; }
+        else if(key == GLFW_KEY_D){ keystate[1] = 1; keystate[0] = 0; }
         else if(key == GLFW_KEY_W){ keystate[2] = 1; }
         else if(key == GLFW_KEY_S){ keystate[3] = 1; }
         else if(key == GLFW_KEY_SPACE){ keystate[4] = 1; }

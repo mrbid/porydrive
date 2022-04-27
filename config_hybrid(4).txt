@@ -1,0 +1,10 @@
+maxspeed 0.0165
+acceleration 0.0028
+inertia 0.00022
+drag 0.00038
+steeringspeed 3.2
+steerinertia 233
+minsteer 0.1
+maxsteer 0.2
+steeringtransfer 0.023
+steeringtransferinertia 280
