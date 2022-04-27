@@ -454,7 +454,8 @@ void rCube(f32 x, f32 y)
     }
 
     // also check to see if cube needs to be blue
-    const uint collision = ((dla1 < 0.11f || dla2 < 0.11f) || dlap < 0.16f);
+    const f32 dla = vDistLa(pp, (vec){x, y, 0.f}); // worth it to prevent the flicker
+    const uint collision = (dla < 0.16f || dlap < 0.16f);
     if(collision == 1 && bindstate2 <= 1)
     {
         glBindBuffer(GL_ARRAY_BUFFER, mdlBlueCubeColors);
