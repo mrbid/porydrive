@@ -448,6 +448,7 @@ void rCube(f32 x, f32 y)
     if(sp > inertia || sp < -inertia)
     {
         const f32 dla1 = vDistLa(cp1, (vec){x, y, 0.f}); // front car
+        const f32 dla0 = vDistLa(pp, (vec){x, y, 0.f}); // center car
         const f32 dla2 = vDistLa(cp2, (vec){x, y, 0.f}); // back car
         if(dla1 <= 0.097f)
         {
@@ -455,6 +456,14 @@ void rCube(f32 x, f32 y)
             vSub(&nf, pp, (vec){x, y, 0.f});
             vNorm(&nf);
             vMulS(&nf, nf, 0.097f-dla1);
+            vAdd(&pv, pv, nf);
+        }
+        else if(dla0 <= 0.097f)
+        {
+            vec nf;
+            vSub(&nf, pp, (vec){x, y, 0.f});
+            vNorm(&nf);
+            vMulS(&nf, nf, 0.097f-dla0);
             vAdd(&pv, pv, nf);
         }
         else if(dla2 <= 0.097f)
