@@ -417,8 +417,23 @@ void rCube(f32 x, f32 y)
         vMulS(&nf, nf, 0.15f-dlap);
         vAdd(&zp, zp, nf);
     }
-    const f32 dla = vDist(pp, (vec){x, y, 0.f}); // car
-    if(dla < 0.15f)
+
+    // front collision cube point
+    vec cp1 = pp;
+    vec cd1 = pd;
+    vMulS(&cd1, cd1, 0.0525f);
+    vAdd(&cp1, cp1, cd1);
+
+    // back collision cube point
+    vec cp2 = pp;
+    vec cd2 = pd;
+    vMulS(&cd2, cd2, -0.0525f);
+    vAdd(&cp2, cp2, cd2);
+
+    // do Axis-Aligned Cube collisions for both points against rCube() being rendered
+    const f32 dla1 = vDistLa(cp1, (vec){x, y, 0.f}); // front car
+    const f32 dla2 = vDistLa(cp2, (vec){x, y, 0.f}); // back car
+    if(dla1 < 0.1f || dla2 < 0.1f)
     {
         vec nf;
         vSub(&nf, pp, (vec){x, y, 0.f});
@@ -426,8 +441,11 @@ void rCube(f32 x, f32 y)
         vMulS(&nf, nf, fabsf(sp)); //dla*sp*10.f
         vAdd(&pv, pv, nf);
     }
-    if((dla < 0.16f || dlap < 0.16f) && bindstate != 2)
+
+    // also check to see if cube needs to be blue
+    if(((dla1 < 0.11f || dla2 < 0.11f) || dlap < 0.16f) && bindstate != 2)
     {
+        // cant just bind the colors here because the two models had different orders, doh, no biggie.
         modelBind(&mdlBlueCube);
         bindstate = 2;
     }
@@ -768,7 +786,22 @@ void main_loop()
         if(zp.y > 17.5f){zp.y = 17.5f; zr = fRandFloat(-PI, PI);}
         else if(zp.y < -17.5f){zp.y = -17.5f; zr = fRandFloat(-PI, PI);}
 
-        if(vDist(pp, zp) < 0.1f)
+        // front collision cube point
+        vec cp1 = pp;
+        vec cd1 = pd;
+        vMulS(&cd1, cd1, 0.0525f);
+        vAdd(&cp1, cp1, cd1);
+
+        // back collision cube point
+        vec cp2 = pp;
+        vec cd2 = pd;
+        vMulS(&cd2, cd2, -0.0525f);
+        vAdd(&cp2, cp2, cd2);
+
+        // do Axis-Aligned Cube collisions for both points against porygon
+        const f32 dla1 = vDistLa(cp1, zp); // front car
+        const f32 dla2 = vDistLa(cp2, zp); // back car
+        if(dla1 < 0.1f || dla2 < 0.1f)
         {
             cp++;
             za = t+6.0;
