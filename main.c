@@ -148,7 +148,8 @@ f32 pr; // rotation
 f32 sr; // steering rotation
 vec pp; // position
 vec pv; // velocity
-vec pd; // direction
+vec pd; // wheel direction
+vec pbd;// body direction
 f32 sp; // speed
 uint cp;// collected porygon count
 double st=0; // start time
@@ -420,13 +421,13 @@ void rCube(f32 x, f32 y)
 
     // front collision cube point
     vec cp1 = pp;
-    vec cd1 = pd;
+    vec cd1 = pbd;
     vMulS(&cd1, cd1, 0.0525f);
     vAdd(&cp1, cp1, cd1);
 
     // back collision cube point
     vec cp2 = pp;
-    vec cd2 = pd;
+    vec cd2 = pbd;
     vMulS(&cd2, cd2, -0.0525f);
     vAdd(&cp2, cp2, cd2);
 
@@ -599,6 +600,11 @@ void rCar(f32 x, f32 y, f32 z, f32 rx)
     mIdent(&model);
     mTranslate(&model, x, y, z);
     mRotZ(&model, -rx);
+
+    // returns direction
+    mGetDirY(&pbd, model);
+    vInv(&pbd);
+
     f32 sy = sp*3.f; // lol speed based and not torque (it will do for now)
     if(sy > 0.03f){sy = 0.03f;}
     if(sy < -0.03f){sy = -0.03f;}
@@ -788,20 +794,20 @@ void main_loop()
 
         // front collision cube point
         vec cp1 = pp;
-        vec cd1 = pd;
+        vec cd1 = pbd;
         vMulS(&cd1, cd1, 0.0525f);
         vAdd(&cp1, cp1, cd1);
 
         // back collision cube point
         vec cp2 = pp;
-        vec cd2 = pd;
+        vec cd2 = pbd;
         vMulS(&cd2, cd2, -0.0525f);
         vAdd(&cp2, cp2, cd2);
 
         // do Axis-Aligned Cube collisions for both points against porygon
         const f32 dla1 = vDistLa(cp1, zp); // front car
         const f32 dla2 = vDistLa(cp2, zp); // back car
-        if(dla1 < 0.1f || dla2 < 0.1f)
+        if(dla1 < 0.04f || dla2 < 0.04f)
         {
             cp++;
             za = t+6.0;
