@@ -2,6 +2,6 @@
 #define GLOBALDEF_H
 
 #define HIDDEN_LAYERS 2
-#define HIDDEN_SIZE 1024
+#define HIDDEN_SIZE 64
 
 #endif
