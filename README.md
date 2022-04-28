@@ -83,7 +83,7 @@ There is one disadvantage to these two systems; they break the laws of accelerat
 
 Great results. Locates porygon quickly for such a small 73kb network. Weights provided [steernet](steeragent_weights.dat) and [gasnet](gasagent_weights.dat).
 
-Increasing the hidden layers or dropout seems to have a negative effect on the trained results.
+_Notes: Increasing the hidden layers or dropout seems to have a negative effect on the trained results._
 
 ### Next Steps
 - Try a SELU network [TFCNNv2.1](https://github.com/mrbid/TFCNNv2/tree/main/TFCNNV2.1) to see if this has improvements with more hidden layer depth.
