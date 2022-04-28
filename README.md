@@ -78,7 +78,7 @@ There is one disadvantage to these two systems; they break the laws of accelerat
 - HIDDEN_LAYERS 1
 - HIDDEN_SIZE 64
 - OPTIM_ADAGRAD
-- DROPOUT 0
+- DROPOUT 0.3
 - BATCHES 32
 
 Great results. Locates porygon quickly for such a small 73kb network. Weights provided [steernet](steeragent_weights.dat) and [gasnet](gasagent_weights.dat).
