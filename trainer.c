@@ -12,6 +12,7 @@
     (compile with clang might yeild faster performance)
 */
 
+#include <time.h>
 #include <unistd.h> // nice
 #include <errno.h>
 
@@ -99,8 +100,10 @@ int main(int argc, char** argv)
     }
     setOptimiser(&net, OPTIM_ADAGRAD);
     setDropout(&net, 0.3f);
+    setBatches(&net, 32);
 
-    // train networks
+    // train network
+    const time_t st = time(0);
     if(argv[1][0] == '0')
     {
         printf("Training Steering Agent.\n");
@@ -113,6 +116,7 @@ int main(int argc, char** argv)
     }
 
     // done
-    printf("Datasets generated.\n");
+    printf("Datasets generated.\nTime Taken: %lu seconds.\n", time(0)-st);
+    //getchar();
     return 0;
 }
