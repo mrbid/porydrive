@@ -77,6 +77,9 @@
 
 #include "esAux2.h"
 
+#include "TFCNNv11.h"
+#include "globaldef.h"
+
 #include "res.h"
 #include "assets/purplecube.h"
 #include "assets/porygon.h"
@@ -154,8 +157,13 @@ f32 sp; // speed
 uint cp;// collected porygon count
 double st=0; // start time
 char tts[32];// time taken string
+
+// ai/ml
 uint auto_drive=0;
+uint neural_drive=0;
 uint dataset_logger=0;
+network steernet;
+network gasnet;
 
 // porygon vars
 vec zp; // position
@@ -354,7 +362,7 @@ void configHybrid()
 // render functions
 //*************************************
 
-__attribute__((always_inline)) inline void modelBind(const ESModel* mdl) // code reduction helper
+__attribute__((always_inline)) inline void modelBind(const ESModel* mdl) // C code reduction helper (more inline opcodes)
 {
     glBindBuffer(GL_ARRAY_BUFFER, mdl->cid);
     glVertexAttribPointer(color_id, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -479,7 +487,7 @@ void rCube(f32 x, f32 y)
         }
     }
 
-    // also check to see if cube needs to be blue
+    // check to see if cube needs to be blue
     const f32 dla = vDist(pp, (vec){x, y, 0.f}); // worth it to prevent the flicker
     const uint collision = (dla < 0.17f || dlap < 0.16f);
     if(collision == 1 && bindstate2 <= 1)
@@ -823,17 +831,32 @@ void main_loop()
         if(ds < 0.01f){ds = 0.01f;}
         else if(ds > 0.06f){ds = 0.06f;}
         if(fabsf(ld-d) > ds && ld < d){td *= -1.f;}
-        sr = (tr * as) * td;
         ld = d;
+        sr = (tr * as) * td;
         if(d < 2.f)
             sp = maxspeed * (d*0.5f)+0.003f;
         else
             sp = maxspeed;
     }
+
+    // neural net
+    if(neural_drive == 1) // Feed-Forward Neural Network (FNN)
+    {
+        vec lad = pp;
+        vSub(&lad, lad, zp);
+        vNorm(&lad);
+        const f32 angle = vDot(pbd, lad);
+        const f32 dist = vDist(pp, zp);
+
+        const float input[6] = {pbd.x, pbd.y, lad.x, lad.y, angle, dist};
+        sr = queryNetwork(&steernet, &input[0]);
+        sp = queryNetwork(&gasnet, &input[0]);
+        printf("ml: %g %g\n", sr, sp);
+    }
     
     // neural net dataset
     // input | output
-    // body direction x&y, porygon directin x&y, angle between directions, distance between car and porygon | car wheel rotation, car speed
+    // body direction x&y, porygon direction x&y, angle between directions, distance between car and porygon | car wheel rotation, car speed
     if(dataset_logger == 1)
     {
         vec lad = pp;
@@ -841,7 +864,7 @@ void main_loop()
         vNorm(&lad);
         const f32 angle = vDot(pbd, lad);
         const f32 dist = vDist(pp, zp);
-        FILE* f = fopen("dataset.dat", "ab");
+        FILE* f = fopen("dataset.dat", "ab"); // append bytes
         if(f != NULL)
         {
             size_t r = 0;
@@ -855,7 +878,7 @@ void main_loop()
             r += fwrite(&sp,  1, sizeof(f32), f);
             if(r != 32)
             {
-                printf("Outch, just wrote corrupted bytes to the dataset! Logging disabled.\n");
+                printf("Outch, just wrote corrupted bytes to the dataset! (last %zu bytes) Logging disabled.\n", r);
                 dataset_logger = 0;
             }
             fclose(f);
@@ -1103,8 +1126,27 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             }
         }
 
-        // toggle auto drive
+        // toggle neural drive
         else if(key == GLFW_KEY_I)
+        {
+            neural_drive = 1 - neural_drive;
+            if(neural_drive == 0)
+            {
+                sp = 0.f;
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] Neural Drive: OFF\n", strts);
+            }
+            else
+            {
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] Neural Drive: ON\n", strts);
+            }
+        }
+
+        // toggle auto drive
+        else if(key == GLFW_KEY_L)
         {
             dataset_logger = 1 - dataset_logger;
 
@@ -1200,8 +1242,9 @@ int main(int argc, char** argv)
     printf("~ Keyboard Input:\n");
     printf("ESCAPE = Focus/Unfocus Mouse Look\n");
     printf("F = FPS to console\n");
-    printf("O = Toggle auto drive\n");
     printf("P = Player stats to console\n");
+    printf("O = Toggle auto drive\n");
+    printf("I = Toggle neural drive\n");
     printf("N = New Game\n");
     printf("W = Drive Forward\n");
     printf("A = Turn Left\n");
@@ -1209,6 +1252,7 @@ int main(int argc, char** argv)
     printf("D = Turn Right\n");
     printf("Space = Break\n");
     printf("1-5 = Car Physics config selection (5 loads from file)\n");
+    printf("L = Toggle dataset logging\n");
     printf("----\n");
     printf("~ Mouse Input:\n");
     printf("RIGHT/MOUSE4 = Zoom Snap Close/Ariel\n");
@@ -1333,6 +1377,14 @@ int main(int argc, char** argv)
 //*************************************
 
     // init
+    if(createNetwork(&steernet, WEIGHT_INIT_UNIFORM_LECUN, 6, HIDDEN_LAYERS, HIDDEN_SIZE) < 0)
+        printf("createNetwork() failed: steernet.\n");
+    if(createNetwork(&gasnet, WEIGHT_INIT_UNIFORM_LECUN, 6, HIDDEN_LAYERS, HIDDEN_SIZE) < 0)
+        printf("createNetwork() failed: gasnet.\n");
+    if(loadWeights(&steernet, "steeragent_weights.dat") == 0)
+        printf("SteerNet Loaded.\n----\n");
+    if(loadWeights(&gasnet, "gassagent_weights.dat") == 0)
+        printf("GasNet Loaded.\n----\n");
     configScarlet();
     loadConfig(0);
     newGame(NEWGAME_SEED);
