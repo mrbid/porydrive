@@ -32,7 +32,7 @@ void trainSteeringAgent()
     // train network
     for(uint i = 0; i < TRAIN_SIZE; i++)
     {
-        const uint ofs = i * 32;
+        const uint ofs = i * 8;
         const float target = trainset[ofs+6]; // steering
         trainNetwork(&net, &trainset[ofs], target);
     }
@@ -49,7 +49,7 @@ void trainGasingAgent()
     // train network
     for(uint i = 0; i < TRAIN_SIZE; i++)
     {
-        const uint ofs = i * 32;
+        const uint ofs = i * 8;
         const float target = trainset[ofs+7]; // gassing
         trainNetwork(&net, &trainset[ofs], target);
     }
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
         exit(0);
     }
     setOptimiser(&net, OPTIM_ADAGRAD);
-    setDropout(&net, 0.3f);
+    setDropout(&net, 0.6f);
     setBatches(&net, 32);
 
     // train network
