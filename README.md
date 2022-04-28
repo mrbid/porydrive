@@ -41,7 +41,7 @@ steeringspeed 1.2
 steerinertia 233
 minsteer 0.32
 maxsteer 0.55
-steeringtransfer 0.019
+steeringtransfer 0.023
 steeringtransferinertia 280
 ```
 - `maxspeed` - top travel speed of car.
