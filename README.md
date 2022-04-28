@@ -11,9 +11,9 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
 ## Keyboard
  - `ESCAPE` = Focus/Unfocus Mouse Look
  - `F` = FPS to console
+ - `P` = Player stats to console
  - `O` = Toggle auto drive
  - `I` = Toggle dataset logging
- - `P` = Player stats to console
  - `N` = New Game
  - `W` = Drive Forward
  - `A` = Turn Left
