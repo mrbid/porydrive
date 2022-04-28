@@ -99,7 +99,7 @@ int main(int argc, char** argv)
         exit(0);
     }
     setOptimiser(&net, OPTIM_ADAGRAD);
-    setDropout(&net, 0.3f);
+    //setDropout(&net, 0.3f);
     setBatches(&net, 32);
 
     // train network
