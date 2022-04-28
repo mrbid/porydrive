@@ -60,7 +60,7 @@
 
 #include <sys/time.h>
 
-#define uint GLushort
+//#define uint GLushort
 #define sint GLshort
 #define f32 GLfloat
 
