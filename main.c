@@ -1129,19 +1129,28 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         // toggle neural drive
         else if(key == GLFW_KEY_I)
         {
-            neural_drive = 1 - neural_drive;
-            if(neural_drive == 0)
+            if(steernet.layer == NULL || gasnet.layer == NULL)
             {
-                sp = 0.f;
                 char strts[16];
                 timestamp(&strts[0]);
-                printf("[%s] Neural Drive: OFF\n", strts);
+                printf("[%s] Neural Drive networks not loaded.\n", strts);
             }
             else
             {
-                char strts[16];
-                timestamp(&strts[0]);
-                printf("[%s] Neural Drive: ON\n", strts);
+                neural_drive = 1 - neural_drive;
+                if(neural_drive == 0)
+                {
+                    sp = 0.f;
+                    char strts[16];
+                    timestamp(&strts[0]);
+                    printf("[%s] Neural Drive: OFF\n", strts);
+                }
+                else
+                {
+                    char strts[16];
+                    timestamp(&strts[0]);
+                    printf("[%s] Neural Drive: ON\n", strts);
+                }
             }
         }
 
@@ -1382,9 +1391,23 @@ int main(int argc, char** argv)
     if(createNetwork(&gasnet, WEIGHT_INIT_UNIFORM_LECUN, 6, HIDDEN_LAYERS, HIDDEN_SIZE) < 0)
         printf("createNetwork() failed: gasnet.\n");
     if(loadWeights(&steernet, "steeragent_weights.dat") == 0)
+    {
         printf("SteerNet Loaded.\n----\n");
+    }
+    else
+    {
+        destroyNetwork(&steernet);
+        steernet.layer = NULL;
+    }
     if(loadWeights(&gasnet, "gassagent_weights.dat") == 0)
+    {
         printf("GasNet Loaded.\n----\n");
+    }
+    else
+    {
+        destroyNetwork(&gasnet);
+        gasnet.layer = NULL;
+    }
     configScarlet();
     loadConfig(0);
     newGame(NEWGAME_SEED);
