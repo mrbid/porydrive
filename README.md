@@ -81,7 +81,7 @@ There is one disadvantage to these two systems; they break the laws of accelerat
 - `DROPOUT` 0.3
 - `BATCHES` 32
 
-Good results. Locates porygon quickly for a small 73kb network. Weights provided [steernet](steeragent_weights.dat) and [gasnet](gasagent_weights.dat).
+Good results for a small 73kb network. Sometimes locates porygon quickly. Weights provided [steernet](steeragent_weights.dat) and [gasnet](gasagent_weights.dat).
 
 _Notes: Increasing the hidden layers or dropout seems to have a negative effect on the trained results._
 
