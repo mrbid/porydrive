@@ -1399,7 +1399,7 @@ int main(int argc, char** argv)
         destroyNetwork(&steernet);
         steernet.layer = NULL;
     }
-    if(loadWeights(&gasnet, "gassagent_weights.dat") == 0)
+    if(loadWeights(&gasnet, "gasagent_weights.dat") == 0)
     {
         printf("GasNet Loaded.\n----\n");
     }
