@@ -10,10 +10,6 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
 
 ## Keyboard
  - `ESCAPE` = Focus/Unfocus Mouse Look
- - `F` = FPS to console
- - `P` = Player stats to console
- - `O` = Toggle auto drive
- - `I` = Toggle dataset logging
  - `N` = New Game
  - `W` = Drive Forward
  - `A` = Turn Left
@@ -21,6 +17,13 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
  - `D` = Turn Right
  - `Space` = Breaks
  - `1-5` = Car Physics config selection _(5 loads from file)_
+
+## Keyboard Dev
+ - `F` = FPS to console
+ - `P` = Player stats to console
+ - `O` = Toggle auto drive
+ - `I` = Toggle neural drive
+ - `L` = Toggle dataset logging
 
 ## Mouse
  - `Mouse Button4` = Zoom Snap Close/Ariel
@@ -51,6 +54,11 @@ steeringtransferinertia 280
 - `maxsteer` - maximum steering angle as scalar _(1 = 180 degree)_ attainable at minimal speeds.
 - `steeringtransfer` - how much the wheel rotation angle translates into rotation of the body the wheels are connected to _(the car)_.
 - `steeringtransferinertia` - how much the `steeringtransfer` reduces as the car speed increases, this is related to `steerinertia` to give the crude effect of traction loss of the front tires as speed increases and the inability to force the wheels into a wider angle at higher speeds.
+
+## Auto Drive & Neural Drive
+Auto Drive is based on a simple concept similar to that of the [Wall follower maze-solving algorithm](https://en.wikipedia.org/wiki/Maze-solving_algorithm#Wall_follower) the principle relies on the fact that if you always turn in one direction and aim to reduce the angle of direction between the agent and the target you will eventually hit the target. On top of this, there is a rule to switch the turn direction if the distance from the target increases by more than a threshold scaled by a scalar based on the distance from the target. It gives a pretty good effect and with competitive results to human players.
+
+The Machine Learning or "neural" agents use a modified version of [TFCNNv1](https://github.com/mrbid/TFCNNv1/blob/main/TFCNNv1.h) and the supplied dataset was captured from ~6.4 hours of the Auto Drive algorithm playing the game. Two agents are trained from this dataset, the `steering agent` and `gasing agent` respectively. One controlling steering and the other controlling speed. The file [`globaldef.h`](https://github.com/mrbid/porydrive/blob/main/globaldef.h) holds the variables that configure the size _(HIDDEN_SIZE)_ and complexity _(HIDDEN_LAYERS)_ of the neural network. If these definitions are changed the neural network will need to be retrained by executing `train.sh`. Other hyperparameters can be configured in the `trainer.c` file itself after `createNetwork()`.
 
 ## Downloads
 
