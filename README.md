@@ -31,7 +31,7 @@ Drive around and "collect" Porygon, each time you collect a Porygon a new one wi
  - `Middle Scroll` = Zoom in/out
 
 ## Configure Car Physics
-It is possible to tweak the car physics by creating a `config.txt` file in the exec/working directory of the game, here is an example of such config file with the default car phsyics variables.
+It is possible to tweak the car physics by creating a `config.txt` file in the exec/working directory of the game, here is an example of such config file with the default car physics variables.
 ```
 maxspeed 0.0095
 acceleration 0.0025
