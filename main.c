@@ -154,6 +154,8 @@ f32 sp; // speed
 uint cp;// collected porygon count
 double st=0; // start time
 char tts[32];// time taken string
+uint auto_drive=0;
+uint dataset_logger=0;
 
 // porygon vars
 vec zp; // position
@@ -792,6 +794,81 @@ void main_loop()
     }
 
 //*************************************
+// auto drive
+//*************************************
+    // side winder
+    /*
+        vec lad = pp;
+        vSub(&lad, lad, zp);
+        vNorm(&lad);
+        const f32 as = fabsf(vDot(pbd, lad)+1.f) * 0.5f;
+        sr = tr * as;
+        const f32 d = vDist(pp, zp);
+        if(d < 2.f)
+            sp = maxspeed * (d*0.5f)+0.003f;
+        else
+            sp = maxspeed;
+    */
+
+    // side winder 2
+    if(auto_drive == 1) // stochastic state machine "ai"
+    {
+        vec lad = pp;
+        vSub(&lad, lad, zp);
+        vNorm(&lad);
+        const f32 as = fabsf(vDot(pbd, lad)+1.f) * 0.5f;
+        static f32 ld = 0.f, td = 1.f;
+        const f32 d = vDist(pp, zp);
+        f32 ds = d * 0.01f;
+        if(ds < 0.01f){ds = 0.01f;}
+        else if(ds > 0.06f){ds = 0.06f;}
+        if(fabsf(ld-d) > ds && ld < d){td *= -1.f;}
+        sr = (tr * as) * td;
+        ld = d;
+        if(d < 2.f)
+            sp = maxspeed * (d*0.5f)+0.003f;
+        else
+            sp = maxspeed;
+    }
+    
+    // neural net dataset
+    // input | output
+    // body direction x&y, porygon directin x&y, angle between directions, distance between car and porygon | car wheel rotation, car speed
+    if(dataset_logger == 1)
+    {
+        vec lad = pp;
+        vSub(&lad, lad, zp);
+        vNorm(&lad);
+        const f32 angle = vDot(pbd, lad);
+        const f32 dist = vDist(pp, zp);
+        FILE* f = fopen("dataset.dat", "ab");
+        if(f != NULL)
+        {
+            size_t r = 0;
+            r += fwrite(&pbd.x, 1, sizeof(f32), f);
+            r += fwrite(&pbd.y, 1, sizeof(f32), f);
+            r += fwrite(&lad.x, 1, sizeof(f32), f);
+            r += fwrite(&lad.y, 1, sizeof(f32), f);
+            r += fwrite(&angle, 1, sizeof(f32), f);
+            r += fwrite(&dist,  1, sizeof(f32), f);
+            r += fwrite(&sr,  1, sizeof(f32), f);
+            r += fwrite(&sp,  1, sizeof(f32), f);
+            if(r != 32)
+            {
+                printf("Outch, just wrote corrupted bytes to the dataset! Logging disabled.\n");
+                dataset_logger = 0;
+            }
+            fclose(f);
+        }
+    }
+    
+    // dataset logging
+    //printf("%f %f %f %f\n", (vAngle(pbd)*-1.f)+d2PI, vAngle(lad)+d2PI, vDot(pbd, lad)+1.f, vDist(pp, zp));
+    //printf("%g %g %g %g :: %g\n", (vAngle(pbd)*-1.f)+d2PI, vAngle(lad)+d2PI, vDot(pbd, lad)+1.f, vDist(pp, zp), sr);
+    //printf("%g %g %g %g :: %g :: %f\n", vAngle(pbd), vAngle(lad), vDot(pbd, lad), vDist(pp, zp), sr, sp);
+    //printf("%g %g %g %g %g %g :: %g :: %f\n", pbd.x, pbd.y, lad.x, lad.y, vDot(pbd, lad), vDist(pp, zp), sr, sp);
+
+//*************************************
 // simulate car
 //*************************************
 
@@ -1006,6 +1083,44 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 fc = 0;
             }
         }
+
+        // toggle auto drive
+        else if(key == GLFW_KEY_O)
+        {
+            auto_drive = 1 - auto_drive;
+            if(auto_drive == 0)
+            {
+                sp = 0.f;
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] Auto Drive: OFF\n", strts);
+            }
+            else
+            {
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] Auto Drive: ON\n", strts);
+            }
+        }
+
+        // toggle auto drive
+        else if(key == GLFW_KEY_I)
+        {
+            dataset_logger = 1 - dataset_logger;
+
+            if(dataset_logger == 1)
+            {
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] Dataset Logger: ON\n", strts);
+            }
+            else
+            {
+                char strts[16];
+                timestamp(&strts[0]);
+                printf("[%s] Dataset Logger: OFF\n", strts);
+            }
+        }
     }
     else if(action == GLFW_RELEASE)
     {
@@ -1085,6 +1200,7 @@ int main(int argc, char** argv)
     printf("~ Keyboard Input:\n");
     printf("ESCAPE = Focus/Unfocus Mouse Look\n");
     printf("F = FPS to console\n");
+    printf("O = Toggle auto drive\n");
     printf("P = Player stats to console\n");
     printf("N = New Game\n");
     printf("W = Drive Forward\n");
