@@ -68,7 +68,7 @@ There is one disadvantage to these two systems; they break the laws of accelerat
 - (car_pos - porygon_pos) normal dir x
 - (car_pos - porygon_pos) normal dir y
 - angle between both normal dir's _(Dot product)_
-- distance between car and porygon
+- Euclidean distance between car and porygon
 
 ### Training data targets _(one target per trained network)_
 - car steering angle
