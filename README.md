@@ -60,6 +60,8 @@ Auto Drive is based on a simple concept similar to that of the [Wall follower ma
 
 The Machine Learning or "neural" agents use a modified version of [TFCNNv1](https://github.com/mrbid/TFCNNv1/blob/main/TFCNNv1.h) and the supplied dataset was captured from ~6.4 hours of the Auto Drive algorithm playing the game. Two agents are trained from this dataset, the `steering agent` and `gasing agent` respectively. One controlling steering and the other controlling speed. The file [`globaldef.h`](https://github.com/mrbid/porydrive/blob/main/globaldef.h) holds the variables that configure the size _(HIDDEN_SIZE)_ and complexity _(HIDDEN_LAYERS)_ of the neural network. If these definitions are changed the neural network will need to be retrained by executing `train.sh`. Other hyperparameters can be configured in the `trainer.c` file itself after `createNetwork()`.
 
+There is one disadvantage to these two systems; they break the laws of acceleration and turn speed. These algorithms can set arbitrary wheel turn angles and speeds with disregard to acceleration limits or wheel turn speed limits. Or well, currently, a post-process could be added to enforce that transitions on these variables stay within such limits.
+
 ## Downloads
 
 ### Snapcraft
