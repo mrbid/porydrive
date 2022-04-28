@@ -62,7 +62,7 @@ The Machine Learning or "neural" agents use a modified version of [TFCNNv1](http
 
 There is one disadvantage to these two systems; they break the laws of acceleration and turn speed. These algorithms can set arbitrary wheel turn angles and speeds with disregard to acceleration limits or wheel turn speed limits. A post-process could be added to enforce that transitions on these variables stay within such limits.
 
-**The input training data is _(4 byte float32 per parameter)_**
+### The input training data is _(4 byte float32 per parameter)_
 - car normal dir x
 - car normal dir y
 - (car_pos - porygon_pos) normal dir x
@@ -70,7 +70,7 @@ There is one disadvantage to these two systems; they break the laws of accelerat
 - angle between directions
 - distance between car and porygon
 
-**Training data targets _(one target per trained network)_**
+### Training data targets _(one target per trained network)_
 - car steering angle
 - car speed
 
