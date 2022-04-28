@@ -74,6 +74,20 @@ There is one disadvantage to these two systems; they break the laws of accelerat
 - car steering angle
 - car speed
 
+### Training Results
+- HIDDEN_LAYERS 1
+- HIDDEN_SIZE 64
+- OPTIM_ADAGRAD
+- DROPOUT 0
+- BATCHES 32
+Great results. Locates porygon quickly for such a small 73kb network.
+
+Increasing the hidden layers or dropout seems to have a negative effect on the trained results.
+
+### Next Steps
+- Try a SELU network [TFCNNv2.1](https://github.com/mrbid/TFCNNv2/tree/main/TFCNNV2.1).
+- Try some networks in Tensorflow Keras
+
 ## Downloads
 
 ### Snapcraft
