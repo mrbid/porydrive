@@ -161,7 +161,7 @@ void randomHyperparameters(network* net);
 */
 
 int createNetwork(network* net, const weight_init_type init_type, const uint num_inputs, const uint num_hidden_layers, const uint num_layer_units);
-float learnNetwork(network* net, const float* inputs, const float target);
+float trainNetwork(network* net, const float* inputs, const float target);
 float queryNetwork(network* net, const float* inputs);
 void resetNetwork(network* net);
 void destroyNetwork(network* net);
