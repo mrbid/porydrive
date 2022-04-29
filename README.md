@@ -81,6 +81,7 @@ There is one disadvantage to these two systems; they break the laws of accelerat
 - `DROPOUT` 0.3
 - `BATCHES` 32
 - `ACTIVATOR` tanh
+- `WEIGHT_INIT_UNIFORM_LECUN`
 
 Good results for a small 73kb network. Sometimes locates porygon quickly. Weights provided [steernet](steeragent_weights.dat) and [gasnet](gasagent_weights.dat).
 
