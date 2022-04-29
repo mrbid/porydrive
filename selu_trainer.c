@@ -8,7 +8,7 @@
     generate a new dataset.dat. It is the size in
     bytes of the file divided by 32.
 
-    compile: gcc trainer.c -lm -o train
+    compile: gcc trainer.c -Ofast -lm -o train
     (compile with clang might yeild faster performance)
 */
 
