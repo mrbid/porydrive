@@ -1390,7 +1390,7 @@ int main(int argc, char** argv)
         printf("createNetwork() failed: steernet.\n");
     if(createNetwork(&gasnet, WEIGHT_INIT_UNIFORM, 6, HIDDEN_LAYERS, HIDDEN_SIZE, 1) < 0)
         printf("createNetwork() failed: gasnet.\n");
-    if(loadNetwork(&steernet, "steeragent_weights.dat") == 0)
+    if(loadNetwork(&steernet, "steeragent_network_selu.dat") == 0)
     {
         printf("SteerNet Loaded.\n----\n");
     }
@@ -1399,7 +1399,7 @@ int main(int argc, char** argv)
         destroyNetwork(&steernet);
         steernet.layer = NULL;
     }
-    if(loadNetwork(&gasnet, "gasagent_weights.dat") == 0)
+    if(loadNetwork(&gasnet, "gasagent_network_selu.dat") == 0)
     {
         printf("GasNet Loaded.\n----\n");
     }

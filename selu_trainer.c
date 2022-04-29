@@ -38,7 +38,7 @@ void trainSteeringAgent()
     }
 
     // save weights
-    saveNetwork(&net, "steeragent_weights.dat");
+    saveNetwork(&net, "steeragent_network_selu.dat");
 }
 
 void trainGasingAgent()
@@ -55,7 +55,7 @@ void trainGasingAgent()
     }
 
     // save weights
-    saveNetwork(&net, "gasagent_weights.dat");
+    saveNetwork(&net, "gasagent_network_selu.dat");
 }
 
 int main(int argc, char** argv)
