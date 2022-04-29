@@ -88,7 +88,7 @@ Good results for a small 73kb network. Sometimes locates porygon quickly. Weight
 _Notes: Increasing the hidden layers or dropout seems to have a negative effect on the trained results._
 
 ### Next Steps
-- Try a SELU network [TFCNNv2.1](https://github.com/mrbid/TFCNNv2/tree/main/TFCNNV2.1) to see if this has improvements with more hidden layer depth. _(SELU support has been added, needs some tweaking still as I am yet to get good trained results, WIP, [selu_trainer.c](selu_trainer.c) & [selu_main.c](selu_main.c))_
+- Try a SELU network [TFCNNv2.1](https://github.com/mrbid/TFCNNv2/tree/main/TFCNNV2.1) to see if this has improvements with more hidden layer depth. _(SELU support has been added, needs some tweaking still as I am yet to get good trained results, WIP, [selu_trainer.c](selu_trainer.c) & [selu_main.c](selu_main.c), honestly I don't think it's worth the time investment when Tensorflow Keras will yeild better results with less time invested.)_
 - Try some networks in Tensorflow Keras, FNN with ADAM and a CNN.
 
 ## Downloads
