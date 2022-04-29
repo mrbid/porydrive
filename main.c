@@ -1386,9 +1386,9 @@ int main(int argc, char** argv)
 //*************************************
 
     // init
-    if(createNetwork(&steernet, WEIGHT_INIT_UNIFORM_LECUN, 6, HIDDEN_LAYERS, HIDDEN_SIZE) < 0)
+    if(createNetwork(&steernet, WEIGHT_INIT_NONE, 6, HIDDEN_LAYERS, HIDDEN_SIZE) < 0)
         printf("createNetwork() failed: steernet.\n");
-    if(createNetwork(&gasnet, WEIGHT_INIT_UNIFORM_LECUN, 6, HIDDEN_LAYERS, HIDDEN_SIZE) < 0)
+    if(createNetwork(&gasnet, WEIGHT_INIT_NONE, 6, HIDDEN_LAYERS, HIDDEN_SIZE) < 0)
         printf("createNetwork() failed: gasnet.\n");
     if(loadWeights(&steernet, "steeragent_weights.dat") == 0)
     {
