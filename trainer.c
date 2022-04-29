@@ -103,6 +103,8 @@ int main(int argc, char** argv)
     setOptimiser(&net, OPTIM_ADAGRAD);
     setDropout(&net, 0.3f);
     setBatches(&net, 32);
+    setWeightInit(&net, WEIGHT_INIT_UNIFORM_LECUN);
+    setActivator(&net, TANH);
 
     // train network
     const time_t st = time(0);

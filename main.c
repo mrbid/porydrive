@@ -68,7 +68,7 @@
 #define GLFW_INCLUDE_NONE
 #include "glfw3.h"
 
-#ifndef __x86_64__ 
+#ifndef __x86_64__
     #define NOSSE
 #endif
 
@@ -851,7 +851,7 @@ void main_loop()
         const float input[6] = {pbd.x, pbd.y, lad.x, lad.y, angle, dist};
         sr = queryNetwork(&steernet, &input[0]);
         sp = queryNetwork(&gasnet, &input[0]);
-        printf("ml: %g %g\n", sr, sp);
+        //printf("ml: %g %g\n", sr, sp);
     }
     
     // neural net dataset

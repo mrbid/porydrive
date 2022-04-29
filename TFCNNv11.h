@@ -52,8 +52,6 @@ struct
     float dropout;
     float momentum;
     float rmsalpha;
-    float min_target;
-    float max_target;
 
     // layers
     ptron** layer;
@@ -154,8 +152,6 @@ void setGain(network* net, const float f);
 void setDropout(network* net, const float f);
 void setMomentum(network* net, const float f);
 void setRMSAlpha(network* net, const float f);
-void setTargetMin(network* net, const float f);
-void setTargetMax(network* net, const float f);
 void randomHyperparameters(network* net);
 
 /*
@@ -462,18 +458,6 @@ void setRMSAlpha(network* net, const float f)
     net->rmsalpha = f;
 }
 
-void setTargetMin(network* net, const float f)
-{
-    if(net == NULL){return;}
-    net->min_target = f;
-}
-
-void setTargetMax(network* net, const float f)
-{
-    if(net == NULL){return;}
-    net->max_target = f;
-}
-
 void randomHyperparameters(network* net)
 {
     if(net == NULL){return;}
@@ -514,8 +498,6 @@ int createNetwork(network* net, const uint init_weights_type, const uint inputs,
     net->dropout    = 0.3f;
     net->momentum   = 0.1f;
     net->rmsalpha   = 0.2f;
-    net->min_target = 0.f;
-    net->max_target = 1.f;
     net->cbatches   = 0;
     net->error      = 0.f;
     net->foutput    = 0.f;
