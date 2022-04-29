@@ -618,7 +618,7 @@ float queryNetwork(network* net, const float* inputs)
             of[i][j] = Activator(doPerceptron(&of[i-1][0], &net->layer[i][j]), net->activator);
 
     // binary classifier output layer
-    const float output = tanh(doPerceptron(&of[net->num_layers-2][0], &net->layer[net->num_layers-1][0]));
+    const float output = tanhf(doPerceptron(&of[net->num_layers-2][0], &net->layer[net->num_layers-1][0]));
 
     // return output
     return output;
@@ -649,7 +649,7 @@ float trainNetwork(network* net, const float* inputs, const float target)
             of[i][j] = Activator(doPerceptron(&of[i-1][0], &net->layer[i][j]), net->activator);
 
     // binary classifier output layer
-    const float output = tanh(doPerceptron(&of[net->num_layers-2][0], &net->layer[net->num_layers-1][0]));
+    const float output = tanhf(doPerceptron(&of[net->num_layers-2][0], &net->layer[net->num_layers-1][0]));
 
 /**************************************
     Backward Prop Error
