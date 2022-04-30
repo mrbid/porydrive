@@ -93,6 +93,11 @@ In hindsight I think the Steering Agent may have had better results without bein
 - ~~Try a SELU network [TFCNNv2.1](https://github.com/mrbid/TFCNNv2/tree/main/TFCNNV2.1) to see if this has improvements with more hidden layer depth.~~ _(SELU support has been added, needs some tweaking still as I am yet to get good trained results, WIP, [selu_trainer.c](selu_trainer.c) & [selu_main.c](selu_main.c), honestly I don't think it's worth the time investment when Tensorflow Keras will yeild better results with less time invested.)_
 - Try some networks in Tensorflow Keras, FNN with ADAM and a CNN.
 
+## Training with Keras
+Keras trains much better than my personal neural networks, partly because Keras supports the superior [ADAM optimiser](https://keras.io/api/optimizers/adam/).
+
+To train the network in Keras first you need to split the `dataset.dat` file into x targets (input data) and y targets (input labels for training). This is done by compiling and running the [splitter.c](splitter.c) program which will output `dataset_x.dat` and `dataset_y.dat`. Then you need to run `train.py` which will output `porygon_model/keras_model`. Then to boot the PoryDrive game you need to run `pred.py` which will execute a daemon that will take data from the PoryDrive game using a RAM file in `/dev/shm/porydrive_input.dat`, run it through the Keras model and then return the result back to a second RAM file `/dev/shm/porydrive_r.dat`. Once `pred.py` is running you can compile and execute the Keras version of PoryDrive by executing `compile_keras.sh`.
+
 ## Downloads
 
 ### Snapcraft
