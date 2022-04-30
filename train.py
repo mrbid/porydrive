@@ -24,8 +24,8 @@ outputsize = 2
 project = "porydrive_model"
 training_iterations = 1
 activator = 'tanh'
-# layers = 3
-layer_units = 32
+hidden_layers = 1
+layer_units = 64
 batches = 32
 
 # training set size
@@ -70,8 +70,8 @@ shuffle_in_unison(train_x, train_y)
 # construct neural network
 model = Sequential()
 model.add(Dense(layer_units, activation=activator, input_dim=inputsize))
-# for x in range(layers-2):
-#     model.add(Dense(layer_units, activation=activator))
+for x in range(hidden_layers-1):
+    model.add(Dense(layer_units, activation=activator))
 model.add(Dense(outputsize, activation='tanh'))
 
 # optim = keras.optimizers.Adam(lr=0.0001)
