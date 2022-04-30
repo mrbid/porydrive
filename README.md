@@ -91,7 +91,7 @@ In hindsight I think the Steering Agent may have had better results without bein
 
 ### Next Steps
 - ~~Try a SELU network [TFCNNv2.1](https://github.com/mrbid/TFCNNv2/tree/main/TFCNNV2.1) to see if this has improvements with more hidden layer depth.~~ _(SELU support has been added, needs some tweaking still as I am yet to get good trained results, WIP, [selu_trainer.c](selu_trainer.c) & [selu_main.c](selu_main.c), honestly I don't think it's worth the time investment when Tensorflow Keras will yeild better results with less time invested.)_
-- Try some networks in Tensorflow Keras, FNN with ADAM and a CNN.
+- ~~Try some networks in Tensorflow Keras, FNN with ADAM and a CNN.~~
 
 ## Training with Tensorflow Keras
 Keras trains much better than my personal neural networks, partly because Keras supports the superior [ADAM optimiser](https://keras.io/api/optimizers/adam/).
