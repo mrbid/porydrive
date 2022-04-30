@@ -102,6 +102,8 @@ The hyperparameters for the Keras network can be configured near the header of [
 
 It doesn't really seem to get any better than 1 hidden layer with 32 - 64 units.
 
+It would be interesting to now train this Keras model on data collected from human input and not the simple "AutoDrive" algorithm.
+
 ## Downloads
 
 ### Snapcraft
