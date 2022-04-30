@@ -381,7 +381,8 @@ static inline float tanhDerivative(const float x) //tanhf()
 
 static inline float selu(const float x)
 {
-    if(x < 0.f){return 1.0507f * (1.67326f * expf(x) - 1.67326f);}
+    //if(x < 0.f){return 1.0507f * (1.67326f * expf(x) - 1.67326f);}
+    if(x < 0.f){return 1.0507f * 1.67326f * (expf(x) - 1.f);}
     return 1.0507f * x;
 }
 

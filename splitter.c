@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     }
 
     // done
-    printf("Datasets generated.\nTime Taken: %lu seconds.\n", time(0)-st);
+    printf("Datasets splitted.\nTime Taken: %lu seconds.\n", time(0)-st);
     //getchar();
     return 0;
 }
