@@ -104,6 +104,8 @@ It doesn't really seem to get any better than 1 hidden layer with 32 - 64 units.
 
 It would be interesting to now train this Keras model on data collected from human input and not the simple "AutoDrive" algorithm.
 
+If you are interested in just the game with no Auto-Drive or Neural Networks then please refer to [Release6](https://github.com/mrbid/porydrive/tree/Release6).
+
 ## Downloads
 
 ### Snapcraft
