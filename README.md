@@ -98,6 +98,8 @@ Keras trains much better than my personal neural networks, partly because Keras 
 
 To train the network in Keras first you need to split the `dataset.dat` file into x targets (input data) and y targets (input labels for training). This is done by compiling and running the [splitter.c](splitter.c) program which will output `dataset_x.dat` and `dataset_y.dat`. Then you need to run [train.py](train.py) which will output `porygon_model/keras_model`. Then to boot the PoryDrive game you need to run [pred.py](pred.py) which will execute a daemon that will take data from the PoryDrive game using a RAM file in `/dev/shm/porydrive_input.dat`, run it through the Keras model, and then return the result back to a second RAM file `/dev/shm/porydrive_r.dat`. Once `pred.py` is running you can compile and execute the Keras version of PoryDrive by executing `compile_keras.sh`.
 
+The hyperparameters for the Keras network can be configured near the header of [train.py](train.py).
+
 ## Downloads
 
 ### Snapcraft
