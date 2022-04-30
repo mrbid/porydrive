@@ -87,7 +87,7 @@ Good results for a small 73kb network. Sometimes locates porygon quickly. Weight
 
 _Notes: Increasing the hidden layers or dropout seems to have a negative effect on the trained results._
 
-In hindsight I think the Steering Agent may have had better results without being trained with Euclidean distance as an input. Just the normal directions may have been enough information because it would probably have been easier to optimise for.
+In hindsight I think the Steering Agent may have had better results without being trained using Euclidean distance as an input. Just the normal directions may have been enough information because it would probably have been easier to optimise for.
 
 ### Next Steps
 - ~~Try a SELU network [TFCNNv2.1](https://github.com/mrbid/TFCNNv2/tree/main/TFCNNV2.1) to see if this has improvements with more hidden layer depth.~~ _(SELU support has been added, needs some tweaking still as I am yet to get good trained results, WIP, [selu_trainer.c](selu_trainer.c) & [selu_main.c](selu_main.c), honestly I don't think it's worth the time investment when Tensorflow Keras will yeild better results with less time invested.)_
