@@ -100,6 +100,8 @@ To train the network in Keras first you need to split the `dataset.dat` file int
 
 The hyperparameters for the Keras network can be configured near the header of [train.py](train.py).
 
+It doesn't seem to really get any better than 1 hidden layer with 32 - 64 units.
+
 ## Downloads
 
 ### Snapcraft
