@@ -860,14 +860,14 @@ void main_loop()
         f = fopen("/dev/shm/porydrive_r.dat", "rb");
         if(f != NULL)
         {
-            if(fread(&ret, 2, sizeof(float), f) != sizeof(float))
-                printf("ERROR: neural read failed.\n");
+            if(fread(&ret, 2, sizeof(float), f) == sizeof(float))
+            {
+                // set new vars
+                sr = ret[0];
+                sp = ret[1];
+            }
             fclose(f);
         }
-
-        // set new vars
-        sr = ret[0];
-        sp = ret[1];
     }
     
     // neural net dataset
