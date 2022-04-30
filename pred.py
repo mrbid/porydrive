@@ -14,7 +14,7 @@ input_size = 6
 model = keras.models.load_model("porydrive_model/keras_model")
 input_size_floats = input_size*4
 while True:
-        #try:
+        try:
                 sleep(0.001)
                 if isfile("/dev/shm/porydrive_input.dat") and getsize("/dev/shm/porydrive_input.dat") == input_size_floats:
                         with open("/dev/shm/porydrive_input.dat", 'rb') as f:
@@ -26,5 +26,5 @@ while True:
                                         y = r.flatten()
                                         with open("/dev/shm/porydrive_r.dat", "wb") as f2:
                                                 f2.write(pack('ff', y[0], y[1]))
-        #except Exception:
-        #        pass
+        except Exception:
+                pass
