@@ -227,7 +227,6 @@ float urandf()
 
 float qRandFloat(const float min, const float max)
 {
-    static const float rmax = (float)RAND_MAX;
 #ifndef FAST_PREDICTABLE_MODE
     static time_t ls = 0;
     if(time(0) > ls)
@@ -241,7 +240,6 @@ float qRandFloat(const float min, const float max)
 
 float uRandFloat(const float min, const float max)
 {
-    static const float rmax = (float)RAND_MAX;
 #ifdef FAST_PREDICTABLE_MODE
     return qRandFloat(min, max);
 #else
@@ -251,7 +249,6 @@ float uRandFloat(const float min, const float max)
 
 float qRandWeight(const float min, const float max)
 {
-    static const float rmax = (float)RAND_MAX;
 #ifndef FAST_PREDICTABLE_MODE
     static time_t ls = 0;
     if(time(0) > ls)
@@ -271,7 +268,6 @@ float qRandWeight(const float min, const float max)
 
 float uRandWeight(const float min, const float max)
 {
-    static const float rmax = (float)RAND_MAX;
 #ifdef FAST_PREDICTABLE_MODE
     return qRandWeight(min, max);
 #else
@@ -287,7 +283,6 @@ float uRandWeight(const float min, const float max)
 
 uint qRand(const uint min, const uint umax)
 {
-    static const float rmax = (float)RAND_MAX;
 #ifndef FAST_PREDICTABLE_MODE
     static time_t ls = 0;
     if(time(0) > ls)
@@ -302,7 +297,6 @@ uint qRand(const uint min, const uint umax)
 
 uint uRand(const uint min, const uint umax)
 {
-    static const float rmax = (float)RAND_MAX;
 #ifdef FAST_PREDICTABLE_MODE
     return qRand(min, umax);
 #else
@@ -313,7 +307,6 @@ uint uRand(const uint min, const uint umax)
 
 float qRandNormal() // Box Muller
 {
-    static const float rmax = (float)RAND_MAX;
 #ifndef FAST_PREDICTABLE_MODE
     static time_t ls = 0;
     if(time(0) > ls)
@@ -336,7 +329,6 @@ float qRandNormal() // Box Muller
 
 float uRandNormal()
 {
-    static const float rmax = (float)RAND_MAX;
 #ifdef FAST_PREDICTABLE_MODE
     return qRandNormal();
 #else
