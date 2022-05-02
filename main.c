@@ -1013,8 +1013,6 @@ void main_loop()
     rDNA(0.f, 0.f, 0.1f);
 
     // render player
-    shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
-    glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
     rCar(pp.x, pp.y, pp.z, pr);
 
 
@@ -1380,6 +1378,9 @@ int main(int argc, char** argv)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.13, 0.13, 0.13, 0.0);
+    
+    shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
+    glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
 
 //*************************************
 // execute update / render loop
