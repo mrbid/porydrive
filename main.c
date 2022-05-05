@@ -59,7 +59,6 @@
 #include <time.h>
 
 #ifdef __linux__
-    #include <sys/time.h>
     #include <unistd.h>
 #elif _WIN32
     #include <windows.h>
