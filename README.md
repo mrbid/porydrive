@@ -5,8 +5,8 @@ A 3D driving game with Neural Networks.
 
 ---
 
-## [THIS IS LEGACY, THE FRAME TIMING CODE IS NOT GOOD FOR THIS TYPE OF GAME, CLICK HERE TO GO TO THE LATEST FORK](https://github.com/PoryDrive/PoryDriveFNN)
-### It was designed to run on 144 FPS monitors, will run okay on 60 FPS too but anything lower is bad and 144 FPS refresh is the sweet spot.
+## [CLICK HERE FOR THE LATEST LINUX FORK](https://github.com/PoryDrive/PoryDriveFNN)
+### This game is capped to 100-144 FPS, if your machine cannot keep up it will just simulate the game a little slower. The latest linux fork has much better timing code. [selu_main.c](selu_main.c) and [keras_main.c](keras_main.c) use an adaptive framerate but the game simulation gets worse below 100 fps and unplayable under 30 fps.
 
 ---
 
