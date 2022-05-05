@@ -1,5 +1,5 @@
 # PoryDrive
-A 3D driving game with Neural Networks.
+A 3D driving game with neural networks.
 
 [![Screenshot of the PoryDrive game](https://raw.githubusercontent.com/mrbid/porydrive/main/screenshot.png)](https://www.youtube.com/watch?v=EoPIzxVX-9E "PoryDrive Game Video")
 
