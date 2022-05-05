@@ -58,7 +58,12 @@
 #include <string.h>
 #include <time.h>
 
-#include <sys/time.h>
+#ifdef __linux__
+    #include <sys/time.h>
+    #include <unistd.h>
+#elif _WIN32
+    #include <windows.h>
+#endif
 
 //#define uint GLushort
 #define sint GLshort
@@ -734,9 +739,9 @@ void main_loop()
 //*************************************
 // time delta for interpolation
 //*************************************
-    static double lt = 0;
-    dt = t-lt;
-    lt = t;
+    // static double lt = 0;
+    // dt = t-lt;
+    // lt = t;
 
 //*************************************
 // keystates
@@ -1013,6 +1018,8 @@ void main_loop()
     rDNA(0.f, 0.f, 0.1f);
 
     // render player
+    shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
+    glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
     rCar(pp.x, pp.y, pp.z, pr);
 
 
@@ -1378,9 +1385,6 @@ int main(int argc, char** argv)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.13, 0.13, 0.13, 0.0);
-    
-    shadeLambert3(&position_id, &projection_id, &modelview_id, &lightpos_id, &normal_id, &color_id, &opacity_id);
-    glUniform3f(lightpos_id, lightpos.x, lightpos.y, lightpos.z);
 
 //*************************************
 // execute update / render loop
@@ -1416,10 +1420,17 @@ int main(int argc, char** argv)
     // reset
     t = glfwGetTime();
     lfct = t;
+    dt = 1.0 / 144.0; // fixed timestep delta-time
     
     // event loop
     while(!glfwWindowShouldClose(window))
     {
+        #ifdef __linux__
+            usleep(6944);
+        #elif _WIN32
+            Sleep(7);
+        #endif
+
         t = glfwGetTime();
         glfwPollEvents();
         main_loop();
