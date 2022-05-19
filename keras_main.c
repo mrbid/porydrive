@@ -115,7 +115,6 @@ mat projection;
 mat view;
 mat model;
 mat modelview;
-mat viewrot;
 
 // render state inputs
 vec lightpos = {0.f, 0.f, 0.f};
