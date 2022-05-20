@@ -859,7 +859,7 @@ void main_loop()
         f = fopen("/dev/shm/porydrive_r.dat", "rb");
         if(f != NULL)
         {
-            if(fread(&ret, 2, sizeof(float), f) == sizeof(float))
+            if(fread(&ret, sizeof(float), 2, f) == 2)
             {
                 // set new vars
                 sr = ret[0];
