@@ -119,7 +119,7 @@ void esRebind(const GLenum target, GLuint* buffer, const void* data, const GLsiz
 void esBindModel(ESModel* model, const GLfloat* vertices, const GLsizei vertlen, const GLushort* indices, const GLsizei indlen)
 {
     esBind(GL_ARRAY_BUFFER, &model->vid, vertices, vertlen * sizeof(GLfloat) * 3, GL_STATIC_DRAW);
-    esBind(GL_ARRAY_BUFFER, &model->iid, indices, indlen * sizeof(GLushort), GL_STATIC_DRAW);
+    esBind(GL_ELEMENT_ARRAY_BUFFER, &model->iid, indices, indlen * sizeof(GLushort), GL_STATIC_DRAW);
 }
 
 GLuint esLoadTexture(const GLuint w, const GLuint h, const unsigned char* data)
