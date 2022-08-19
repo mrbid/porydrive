@@ -1,6 +1,6 @@
 /*
 --------------------------------------------------
-    James William Fletcher (james@voxdsp.com)
+    James William Fletcher (github.com/mrbid)
         October 2020 - TFCNNv1
         April   2022 - TFCNNv1.1
 --------------------------------------------------
