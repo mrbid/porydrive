@@ -976,16 +976,19 @@ void main_loop()
     if(focus_cursor == 1)
     {
         glfwGetCursorPos(window, &x, &y);
+        
+        if(x != ww2 || y != wh2)
+        {
+            xrot += (ww2-x)*sens;
+            yrot += (wh2-y)*sens;
 
-        xrot += (ww2-x)*sens;
-        yrot += (wh2-y)*sens;
+            if(yrot > 1.5f)
+                yrot = 1.5f;
+            if(yrot < 0.5f)
+                yrot = 0.5f;
 
-        if(yrot > 1.5f)
-            yrot = 1.5f;
-        if(yrot < 0.5f)
-            yrot = 0.5f;
-
-        glfwSetCursorPos(window, ww2, wh2);
+            glfwSetCursorPos(window, ww2, wh2);
+        }
     }
 
     mIdent(&view);
