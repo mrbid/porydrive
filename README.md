@@ -5,6 +5,8 @@ A 3D driving game with neural networks.
 
 ---
 
+**WebGL Fork:** https://notabug.org/Vandarin/PoryDrive
+
 ## [CLICK HERE FOR THE LATEST LINUX FORK](https://github.com/PoryDrive/PoryDriveFNN)
 ### This game is capped to 100-144 FPS, if your machine cannot keep up it will just simulate the game a little slower. The latest linux fork has much better timing code. [selu_main.c](selu_main.c) and [keras_main.c](keras_main.c) use an adaptive framerate but the game simulation gets worse below 100 fps and unplayable under 30 fps.
 
