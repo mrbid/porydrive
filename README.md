@@ -10,6 +10,7 @@ The above link has the latest fun version of the game to play, the one in this r
 * **Play Online:** https://mrbid.github.io/porydrive
 * **Flathub:** https://flathub.org/apps/com.voxdsp.PoryDrive
 * **Windows:** https://notabug.org/attachments/d49923d5-230c-408a-9440-693ca8462bb6
+* **Source Code:** https://notabug.org/Vandarin/PoryDrive
 
 ---
 
