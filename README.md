@@ -6,7 +6,7 @@ A 3D driving game with neural networks.
 ---
 
 ## **Latest GLFW/WebGL Fork:** https://notabug.org/Vandarin/PoryDrive
-The above link has the latest fun version of the game to play, the one in this repository is the first release which is a bit of a mess.
+The above link has the latest fun version of the game to play, the one in this repository is the first release which is a bit of a mess. [Click here](https://mrbid.github.io/PoryDrive) to play it right now in the web browser.
 
 ---
 
